@@ -6,7 +6,7 @@ After=network.target postgresql.service
 User=anubis
 WorkingDirectory=/home/anubis/yulimo/backend
 EnvironmentFile=/home/anubis/yulimo/backend/.env
-ExecStart=/home/anubis/yulimo/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --workers 2
+ExecStart=/home/anubis/yulimo/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8001 --workers 2
 Restart=always
 RestartSec=3
 
