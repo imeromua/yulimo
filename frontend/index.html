@@ -8,14 +8,14 @@
     <meta name="keywords" content="база відпочинку, пуща водиця, київ, котеджі, номери, ресторан, сауна, риболовля, відпочинок, юлімо">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Юлімо — База відпочинку у Пущі-Водиці">
-    <meta property="og:description" content="Зануртесь в лісовій казці за 15 хвилин від центру Києва. Номери, котеджі, ресторан, сауна, риболовля.">
+    <meta property="og:description" content="Зануртесь у лісову казку за 15 хвилин від центру Києва. Номери, котеджі, ресторан, сауна, риболовля.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://yulimo.kyiv.ua">
     <meta property="og:locale" content="uk_UA">
     <link rel="canonical" href="https://yulimo.kyiv.ua">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 
     <script type="application/ld+json">
@@ -48,48 +48,81 @@
     </script>
 </head>
 <body>
-
-    <!-- NAVIGATION -->
     <nav class="navbar" id="navbar">
         <div class="container nav-inner">
-            <a href="#" class="logo">
+            <a href="#home" class="logo">
                 <span class="logo-icon">🌲</span>
                 <span class="logo-text">ЮЛІМО</span>
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#about">Про нас</a></li>
                 <li><a href="#rooms">Номери</a></li>
+                <li><a href="#gallery">Галерея</a></li>
                 <li><a href="#restaurant">Ресторан</a></li>
+                <li><a href="#menu">Меню</a></li>
                 <li><a href="#services">Послуги</a></li>
                 <li><a href="#contacts">Контакти</a></li>
             </ul>
             <a href="#booking" class="btn btn-primary nav-btn">Забронювати</a>
-            <button class="burger" id="burger" aria-label="Меню">
+            <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="navLinks">
                 <span></span><span></span><span></span>
             </button>
         </div>
     </nav>
 
-    <!-- HERO -->
     <section class="hero" id="home">
         <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
-        <div class="container hero-content">
-            <p class="hero-label">Пуща-Водиця · Київ · 15 хвилин</p>
-            <h1 class="hero-title">Відпочинок<br>серед сосен</h1>
-            <p class="hero-subtitle">Юлімо — місце, де природа зустрічає комфорт. Номери, котеджі, ресторан, сауна і риболовля в серці природного парку.</p>
-            <div class="hero-actions">
-                <a href="#booking" class="btn btn-primary btn-lg">Забронювати номер</a>
-                <a href="#rooms" class="btn btn-outline btn-lg">Переглянути номери</a>
+        <div class="hero-glow hero-glow-one"></div>
+        <div class="hero-glow hero-glow-two"></div>
+        <div class="container hero-layout">
+            <div class="hero-content">
+                <p class="hero-label">Пуща-Водиця · Київ · 15 хвилин</p>
+                <h1 class="hero-title">Відпочинок,<br>який хочеться повторити</h1>
+                <p class="hero-subtitle">Юлімо — заміський простір серед сосен, де поєднуються тиша лісу, затишні номери, ресторан з домашньою кухнею та атмосфера справжнього перезавантаження.</p>
+                <div class="hero-actions">
+                    <a href="#booking" class="btn btn-primary btn-lg">Забронювати номер</a>
+                    <a href="#menu" class="btn btn-outline btn-lg">Переглянути меню</a>
+                </div>
+                <div class="hero-phones">
+                    <a href="tel:+380735376037" class="hero-phone">📞 +38 (073) 537-60-37</a>
+                    <a href="tel:+380985376037" class="hero-phone">📞 +38 (098) 537-60-37</a>
+                </div>
+                <div class="hero-metrics">
+                    <div class="hero-metric">
+                        <strong>12</strong>
+                        <span>номерів і котеджів</span>
+                    </div>
+                    <div class="hero-metric">
+                        <strong>4 сезони</strong>
+                        <span>відпочинку в лісі</span>
+                    </div>
+                    <div class="hero-metric">
+                        <strong>100%</strong>
+                        <span>атмосфери затишку</span>
+                    </div>
+                </div>
             </div>
-            <div class="hero-phones">
-                <a href="tel:+380735376037" class="hero-phone">📞 +38 (073) 537-60-37</a>
-                <a href="tel:+380985376037" class="hero-phone">📞 +38 (098) 537-60-37</a>
+            <div class="hero-showcase reveal">
+                <div class="showcase-card showcase-main">
+                    <span class="showcase-kicker">Тиша · Природа · Комфорт</span>
+                    <h3>Заміський відпочинок з преміальним настроєм</h3>
+                    <p>Вечірнє підсвічування території, аромат сосен, теплий ресторан та приватні котеджі для романтичних поїздок і сімейних вихідних.</p>
+                </div>
+                <div class="showcase-row">
+                    <div class="showcase-card showcase-small">
+                        <span>🍽️ Ресторан</span>
+                        <p>Авторські сніданки, гриль, банкетні подачі.</p>
+                    </div>
+                    <div class="showcase-card showcase-small">
+                        <span>🧖 SPA</span>
+                        <p>Сауна, релакс, простір для відновлення.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- QUICK BOOKING -->
     <section class="quick-booking">
         <div class="container">
             <form class="booking-bar" id="quickBookingForm">
@@ -118,15 +151,14 @@
         </div>
     </section>
 
-    <!-- ABOUT -->
     <section class="section" id="about">
         <div class="container">
             <div class="about-grid">
                 <div class="about-text">
                     <p class="section-label">Про нас</p>
-                    <h2 class="section-title">Місце, де природа<br>зустрічає комфорт</h2>
-                    <p class="about-desc">Юлімо — це затишок серед соснового лісу національного парку Пуща-Водиця. Ми запрошуємо вас відпочити від міської суети в оточенні чистого повітря, шуму сосен і співу птахів. Всього 15 хвилин від центру Києва — і ви вже в іншому світі.</p>
-                    <p class="about-desc">Ми пропонуємо зручний відпочинок для всієї родини, романтичний відрив для двох, корпоративні заходи та святкування. Наш персонал піклується про кожного гостя, щоб ваш відпочинок був справді незабутнім.</p>
+                    <h2 class="section-title">Місце, де природа<br>зустрічає сервіс</h2>
+                    <p class="about-desc">Юлімо — це відпочинок серед соснового лісу Пущі-Водиці, де можна переключитися з міського ритму на спокій, свіже повітря і теплу атмосферу заміського комплексу.</p>
+                    <p class="about-desc">Ми створюємо простір для вихідних удвох, відпочинку всією родиною, камерних святкувань та корпоративних подій без зайвого шуму і метушні.</p>
                     <div class="about-stats">
                         <div class="stat">
                             <span class="stat-num">15</span>
@@ -137,56 +169,55 @@
                             <span class="stat-label">номерів і котеджів</span>
                         </div>
                         <div class="stat">
-                            <span class="stat-num">4★</span>
-                            <span class="stat-label">рейтинг гостей</span>
+                            <span class="stat-num">24/7</span>
+                            <span class="stat-label">піклування про гостей</span>
                         </div>
                     </div>
                 </div>
                 <div class="about-features">
-                    <div class="feature-card">
+                    <div class="feature-card reveal">
                         <div class="feature-icon">🌲</div>
                         <h3>Сосновий ліс</h3>
-                        <p>Природний парк Пуща-Водиця — один з найбільших лісових масивів поруч Києва</p>
+                        <p>Тиша, чисте повітря та відчуття, ніби ви далеко за містом, хоча Київ зовсім поруч.</p>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card reveal">
                         <div class="feature-icon">🍽️</div>
-                        <h3>Домашня кухня</h3>
-                        <p>Свіжі продукти з власної огороди та місцевих фермерів, риба з власного озера</p>
+                        <h3>Справжня кухня</h3>
+                        <p>Теплі сніданки, сімейні вечері, банкетні столи та сезонні страви для будь-якого формату відпочинку.</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🧖</div>
-                        <h3>Сауна та СПА</h3>
-                        <p>Фінська сауна, парова кімната та релаксаційні процедури для душі й тіла</p>
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">🛖</div>
+                        <h3>Номери і котеджі</h3>
+                        <p>Формати проживання для пар, сімей, друзів і гостей, які цінують приватність.</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🎣</div>
-                        <h3>Риболовля</h3>
-                        <p>Власне озеро з карпом, щукою і линем — ідеальне місце для рибалоків</p>
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">✨</div>
+                        <h3>Події та релакс</h3>
+                        <p>Сауна, риболовля, камерні святкування, відпочинок на природі та затишні вечори.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ROOMS -->
     <section class="section section-dark" id="rooms">
         <div class="container">
             <div class="section-header">
                 <p class="section-label">Розміщення</p>
                 <h2 class="section-title">Номери та котеджі</h2>
-                <p class="section-subtitle">Кожний номер обладнаний з турботою про комфорт і затишок. Усі номери мають вихід до лісу або власний двір.</p>
+                <p class="section-subtitle">Кожен формат проживання продуманий так, щоб відпочинок був теплим, приватним і комфортним у будь-яку пору року.</p>
             </div>
-            <div class="rooms-grid" id="roomsGrid">
-                <div class="room-card">
-                    <div class="room-photo" style="background:#2d5a3d">
-                        <div class="room-photo-placeholder">🏡</div>
+            <div class="rooms-grid">
+                <div class="room-card reveal">
+                    <div class="room-photo room-photo-one">
+                        <div class="room-photo-badge">Панорамний вид</div>
                     </div>
                     <div class="room-info">
                         <div class="room-header">
                             <h3>Стандартний номер</h3>
                             <div class="room-price">від <strong>1200</strong> грн/ніч</div>
                         </div>
-                        <p class="room-desc">Затишний номер з панорамним вікном у сосновий ліс. Ідеально для пар та невеликих компаній.</p>
+                        <p class="room-desc">Затишний номер із природними відтінками, панорамним світлом та атмосферою спокійного лісового ранку.</p>
                         <div class="room-meta">
                             <span>👥 2–3 гості</span>
                             <span>📍 25 м²</span>
@@ -198,17 +229,17 @@
                         <a href="#booking" class="btn btn-outline btn-sm">Забронювати</a>
                     </div>
                 </div>
-                <div class="room-card featured">
+                <div class="room-card featured reveal">
                     <div class="room-badge">Популярний</div>
-                    <div class="room-photo" style="background:#1a3a2a">
-                        <div class="room-photo-placeholder">🏠</div>
+                    <div class="room-photo room-photo-two">
+                        <div class="room-photo-badge">Для компаній</div>
                     </div>
                     <div class="room-info">
                         <div class="room-header">
                             <h3>Котедж</h3>
                             <div class="room-price">від <strong>2800</strong> грн/ніч</div>
                         </div>
-                        <p class="room-desc">Окремий котедж з власною кухнею, мангалом та терасою. Ідеально для великих компаній, сімей з дітьми та святкувань.</p>
+                        <p class="room-desc">Окремий будинок з терасою, мангалом і простором для сімейних вихідних, святкувань та довгих вечорів.</p>
                         <div class="room-meta">
                             <span>👥 4–6 гостей</span>
                             <span>📍 60 м²</span>
@@ -220,16 +251,16 @@
                         <a href="#booking" class="btn btn-primary btn-sm">Забронювати</a>
                     </div>
                 </div>
-                <div class="room-card">
-                    <div class="room-photo" style="background:#3d5a2d">
-                        <div class="room-photo-placeholder">🛌</div>
+                <div class="room-card reveal">
+                    <div class="room-photo room-photo-three">
+                        <div class="room-photo-badge">Романтичний формат</div>
                     </div>
                     <div class="room-info">
                         <div class="room-header">
                             <h3>Люкс сюіт</h3>
                             <div class="room-price">від <strong>2000</strong> грн/ніч</div>
                         </div>
-                        <p class="room-desc">Просторий двокімнатний номер з джакузі, терасою та видом на ліс. Ідеальний варіант для романтичного відпочинку.</p>
+                        <p class="room-desc">Просторий двокімнатний люкс з терасою, м’яким освітленням та настроєм для особливого відпочинку удвох.</p>
                         <div class="room-meta">
                             <span>👥 2–4 гості</span>
                             <span>📍 45 м²</span>
@@ -245,30 +276,82 @@
         </div>
     </section>
 
-    <!-- RESTAURANT -->
+    <section class="section" id="gallery">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-label">Атмосфера</p>
+                <h2 class="section-title">Фотогалерея настрою</h2>
+                <p class="section-subtitle">Поки готуємо реальні фото, ми зібрали візуальний настрій майбутньої галереї — як має відчуватися Юлімо на сайті.</p>
+            </div>
+            <div class="gallery-grid">
+                <article class="gallery-card gallery-card-tall reveal">
+                    <div class="gallery-card-media gallery-forest"></div>
+                    <div class="gallery-card-body">
+                        <span>Територія</span>
+                        <h3>Сосни, підсвічені доріжки та тиша</h3>
+                        <p>Вечірній настрій заміського комплексу з глибокими зеленими відтінками та м’яким золотим світлом.</p>
+                    </div>
+                </article>
+                <article class="gallery-card reveal">
+                    <div class="gallery-card-media gallery-room"></div>
+                    <div class="gallery-card-body">
+                        <span>Номери</span>
+                        <h3>Теплі інтер’єри</h3>
+                        <p>Світлі текстури, дерево, натуральні тканини та великий акцент на затишок.</p>
+                    </div>
+                </article>
+                <article class="gallery-card reveal">
+                    <div class="gallery-card-media gallery-food"></div>
+                    <div class="gallery-card-body">
+                        <span>Ресторан</span>
+                        <h3>Подача з характером</h3>
+                        <p>Домашня кухня у сучасній візуальній подачі для сімейних вечорів і святкувань.</p>
+                    </div>
+                </article>
+                <article class="gallery-card reveal">
+                    <div class="gallery-card-media gallery-spa"></div>
+                    <div class="gallery-card-body">
+                        <span>Релакс</span>
+                        <h3>Сауна та відновлення</h3>
+                        <p>Тепле дерево, приглушене світло і спокійний настрій без зайвого шуму.</p>
+                    </div>
+                </article>
+                <article class="gallery-card reveal">
+                    <div class="gallery-card-media gallery-cottage"></div>
+                    <div class="gallery-card-body">
+                        <span>Котеджі</span>
+                        <h3>Приватність і простір</h3>
+                        <p>Окремі будинки для сімей, компаній та камерних святкувань на природі.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
     <section class="section" id="restaurant">
         <div class="container">
             <div class="restaurant-grid">
                 <div class="restaurant-text">
                     <p class="section-label">Гастрономія</p>
                     <h2 class="section-title">Ресторан<br>«Сосновий дім»</h2>
-                    <p>Наш ресторан — це гостинність з душею. Домашня українська кухня з місцевих продуктів: риба з власного озера, свіжі овочі з грядки, хліб з власної печі. Ми готуємо сніданки, обіди та вечері з однаковою любов’ю до кожного страви.</p>
+                    <p>Наш ресторан — це кухня, яка створює настрій відпочинку: теплі сніданки, страви з грилю, домашня класика, сезонні пропозиції та красиві подачі для звичайних вечерь і великих подій.</p>
                     <ul class="restaurant-features">
-                        <li>✨ Сезонне меню з місцевих продуктів — свіже і корисне</li>
-                        <li>🔥 Гриль, барбекю та банкетне обслуговування</li>
-                        <li>🍾 Власна випічка щодня — хліб, булочки, паска</li>
-                        <li>🍷 Вибір українських вин, напоїв та безалкогольних напоїв</li>
-                        <li>🍱 Сніданок для гостей — входить у вартість проживання</li>
+                        <li>✨ Сезонне меню з локальним настроєм</li>
+                        <li>🔥 Гриль, барбекю та банкетні подачі</li>
+                        <li>🍞 Власна випічка та сніданкові сети</li>
+                        <li>🍷 Напої, вина та авторські лимонади</li>
+                        <li>🎉 Формати для вечерь, подій і святкувань</li>
                     </ul>
                     <div class="restaurant-actions">
-                        <a href="#" class="btn btn-primary">Переглянути меню</a>
+                        <a href="#menu" class="btn btn-primary">Переглянути меню</a>
                         <a href="#booking" class="btn btn-outline">Забронювати столик</a>
                     </div>
                 </div>
-                <div class="restaurant-visual">
-                    <div class="restaurant-img-placeholder">
-                        <span>🍽️</span>
-                        <p>Фото ресторану</p>
+                <div class="restaurant-visual reveal">
+                    <div class="restaurant-scene">
+                        <div class="restaurant-scene-badge">Chef's choice</div>
+                        <h3>Меню для затишних сніданків і красивих вечерь</h3>
+                        <p>Ми вже додали окремий блок меню на сайт, щоб гість бачив позиції, категорії та формат подачі ще до бронювання.</p>
                     </div>
                     <div class="restaurant-hours">
                         <h4>Години роботи</h4>
@@ -281,56 +364,117 @@
         </div>
     </section>
 
-    <!-- SERVICES -->
+    <section class="section section-dark" id="menu">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-label">Меню ресторану</p>
+                <h2 class="section-title">Смаки, заради яких хочеться лишитися довше</h2>
+                <p class="section-subtitle">Тимчасове демо-меню для презентації сайту. Пізніше його можна легко замінити на реальні позиції, ціни та фото страв.</p>
+            </div>
+            <div class="menu-grid">
+                <article class="menu-card reveal">
+                    <div class="menu-card-head">
+                        <h3>Сніданки</h3>
+                        <span>з 08:00</span>
+                    </div>
+                    <ul class="menu-list">
+                        <li><strong>Сніданок «Юлімо»</strong><span>Омлет, тости, салат, сезонний напій</span></li>
+                        <li><strong>Сирники з ягідним соусом</strong><span>Ніжні сирники зі сметаною та сезонними ягодами</span></li>
+                        <li><strong>Шакшука в сковороді</strong><span>Томати, яйця, зелень, свіжий хліб</span></li>
+                    </ul>
+                </article>
+                <article class="menu-card reveal">
+                    <div class="menu-card-head">
+                        <h3>Основні страви</h3>
+                        <span>шеф-рекомендації</span>
+                    </div>
+                    <ul class="menu-list">
+                        <li><strong>Стейк зі свинини на грилі</strong><span>Подача з картоплею, соусом і зеленню</span></li>
+                        <li><strong>Філе судака</strong><span>З овочами гриль та лимонним маслом</span></li>
+                        <li><strong>Куряче філе су-від</strong><span>З кремовим соусом і печеними овочами</span></li>
+                    </ul>
+                </article>
+                <article class="menu-card reveal">
+                    <div class="menu-card-head">
+                        <h3>Салати та закуски</h3>
+                        <span>легкий формат</span>
+                    </div>
+                    <ul class="menu-list">
+                        <li><strong>Салат з печеним буряком</strong><span>М’який сир, горіхи, медова заправка</span></li>
+                        <li><strong>Теплий салат з куркою</strong><span>Листя салату, соус, томати, пармезан</span></li>
+                        <li><strong>Дошка закусок</strong><span>Сири, м’ясо, оливки, грінки, соуси</span></li>
+                    </ul>
+                </article>
+                <article class="menu-card reveal">
+                    <div class="menu-card-head">
+                        <h3>Напої та десерти</h3>
+                        <span>солодке завершення</span>
+                    </div>
+                    <ul class="menu-list">
+                        <li><strong>Фірмовий лимонад</strong><span>Цитрус, м’ята, ягідні акценти</span></li>
+                        <li><strong>Наполеон по-домашньому</strong><span>Легкий крем і хрусткі коржі</span></li>
+                        <li><strong>Чайна карта та кава</strong><span>Класика, трав’яні збори, сезонні напої</span></li>
+                    </ul>
+                </article>
+            </div>
+            <div class="menu-banner reveal">
+                <div>
+                    <span class="menu-banner-label">Для банкетів та подій</span>
+                    <h3>Окремо підготуємо сет-меню для святкувань, корпоративів і сімейних вечерь</h3>
+                </div>
+                <a href="#booking" class="btn btn-primary">Запитати про банкет</a>
+            </div>
+        </div>
+    </section>
+
     <section class="section section-dark" id="services">
         <div class="container">
             <div class="section-header">
                 <p class="section-label">Дозвілля</p>
                 <h2 class="section-title">Послуги</h2>
-                <p class="section-subtitle">Все необхідне для повноцінного відпочинку в одному місці</p>
+                <p class="section-subtitle">Усе необхідне для повноцінного відпочинку, коли хочеться не поспішати та насолоджуватися моментом.</p>
             </div>
             <div class="services-grid">
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">🧖</div>
                     <h3>Сауна</h3>
-                    <p>Фінська сауна з преміальними ароматами та паровою кімнатою. До послуги входить рушники та напої.</p>
+                    <p>Формат для перезавантаження після міського ритму, вечірнього релаксу та відпочинку невеликою компанією.</p>
                 </div>
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">🌊</div>
                     <h3>Басейн</h3>
-                    <p>Відкритий басейн з підігрівом в літній період. Обладнаний лежаками та зоною відпочинку.</p>
+                    <p>Літній простір для спокійного відпочинку, сонця, лежаків та неквапливих днів на території комплексу.</p>
                 </div>
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">🔥</div>
                     <h3>Мангальна зона</h3>
-                    <p>Обладнані мангали для барбекю під відкритим небом. Дрова, вугілля, посуд, дошки — все є.</p>
+                    <p>Для барбекю, сімейних вечорів і затишних зустрічей на свіжому повітрі серед сосен.</p>
                 </div>
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">🎣</div>
                     <h3>Риболовля</h3>
-                    <p>Власне озеро з карпом, щукою і линем. Можна орендувати снасті і вудочки. Рибалка входить у вартість проживання.</p>
+                    <p>Спокійний формат дозвілля для гостей, які хочуть побути на природі, не виїжджаючи далеко від Києва.</p>
                 </div>
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">👶</div>
-                    <h3>Дитячий майданчик</h3>
-                    <p>Безпечне дозвілля для дітей всіх віків. Игрові горки, карусель, пісочниця. Батьки можуть відпочивати поруч.</p>
+                    <h3>Дитячий простір</h3>
+                    <p>Комфортний сімейний відпочинок, коли дорослі можуть розслабитися, а діти — активно проводити час поруч.</p>
                 </div>
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">🎉</div>
-                    <h3>Корпоративи</h3>
-                    <p>Організуємо свята, корпоративи, день народження. Банкетне обслуговування до 100 осіб.</p>
+                    <h3>Події</h3>
+                    <p>Камерні святкування, дні народження, невеликі корпоративи та вечері зі спеціальною подачею.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- BOOKING FORM -->
     <section class="section" id="booking">
         <div class="container">
             <div class="section-header">
                 <p class="section-label">Онлайн</p>
                 <h2 class="section-title">Забронювати номер</h2>
-                <p class="section-subtitle">Залиште заявку і ми зв’яжемось з вами протягом дня. Або зателефонуйте зараз!</p>
+                <p class="section-subtitle">Залиште заявку, і ми зв’яжемося з вами для уточнення деталей проживання, столика або події.</p>
             </div>
             <form class="booking-form" id="bookingForm">
                 <div class="form-row">
@@ -349,11 +493,13 @@
                         <input type="email" placeholder="your@email.com">
                     </div>
                     <div class="form-group">
-                        <label>Тип номеру</label>
+                        <label>Формат запиту</label>
                         <select>
                             <option>Стандартний номер</option>
                             <option>Люкс сюіт</option>
                             <option>Котедж</option>
+                            <option>Столик у ресторані</option>
+                            <option>Банкет / подія</option>
                         </select>
                     </div>
                 </div>
@@ -369,32 +515,31 @@
                 </div>
                 <div class="form-group">
                     <label>Коментар</label>
-                    <textarea rows="3" placeholder="Побажання, запитання, особливі потреби..."></textarea>
+                    <textarea rows="3" placeholder="Побажання, кількість гостей, формат події, питання щодо меню..."></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary btn-lg btn-full">Надіслати заявку</button>
             </form>
         </div>
     </section>
 
-    <!-- CONTACTS -->
     <section class="section section-dark" id="contacts">
         <div class="container">
             <div class="section-header">
                 <p class="section-label">Зв'язок</p>
                 <h2 class="section-title">Як нас знайти</h2>
-                <p class="section-subtitle">Ми знаходимось в серці Пущі-Водиці. Зупиньтесь зупинком і за 20 хвилин ви вже серед сосен.</p>
+                <p class="section-subtitle">Ми знаходимося в Пущі-Водиці — достатньо близько до міста, щоб швидко доїхати, і достатньо далеко, щоб відчути справжній відпочинок.</p>
             </div>
             <div class="contacts-grid">
                 <div class="contact-info">
-                    <div class="contact-item">
+                    <div class="contact-item reveal">
                         <div class="contact-icon">📍</div>
                         <div>
                             <h4>Адреса</h4>
                             <p>Пуща-Водиця, Київ</p>
-                            <small>за GPS: 50.554606, 30.344607</small>
+                            <small>GPS: 50.554606, 30.344607</small>
                         </div>
                     </div>
-                    <div class="contact-item">
+                    <div class="contact-item reveal">
                         <div class="contact-icon">📞</div>
                         <div>
                             <h4>Телефони</h4>
@@ -402,20 +547,20 @@
                             <p><a href="tel:+380985376037">+38 (098) 537-60-37</a></p>
                         </div>
                     </div>
-                    <div class="contact-item">
+                    <div class="contact-item reveal">
                         <div class="contact-icon">✉️</div>
                         <div>
                             <h4>Email</h4>
                             <p><a href="mailto:info@yulimo.kyiv.ua">info@yulimo.kyiv.ua</a></p>
                         </div>
                     </div>
-                    <div class="contact-socials">
-                        <a href="https://instagram.com/yulimo" target="_blank" rel="noopener" class="social-btn social-ig">📸 Instagram</a>
-                        <a href="https://facebook.com/yulimo" target="_blank" rel="noopener" class="social-btn social-fb">👤 Facebook</a>
-                        <a href="https://t.me/yulimo" target="_blank" rel="noopener" class="social-btn social-tg">✈️ Telegram</a>
+                    <div class="contact-socials reveal">
+                        <button type="button" class="social-btn social-disabled" data-placeholder="instagram">📸 Instagram <span>скоро</span></button>
+                        <button type="button" class="social-btn social-disabled" data-placeholder="facebook">👤 Facebook <span>скоро</span></button>
+                        <button type="button" class="social-btn social-disabled" data-placeholder="telegram">✈️ Telegram <span>скоро</span></button>
                     </div>
                 </div>
-                <div class="contact-map">
+                <div class="contact-map reveal">
                     <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2537.5!2d30.344607!3d50.554606!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTDCsDMzJzE2LjYiTiAzMMKwMjAnNDAuNiJF!5e0!3m2!1suk!2sua!4v1"
                         width="100%"
@@ -431,20 +576,19 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
     <footer class="footer">
         <div class="container">
             <div class="footer-top">
                 <div class="footer-brand">
                     <div class="footer-logo">🌲 ЮЛІМО</div>
-                    <p>База відпочинку серед сосен Пущі-Водиці. Номери, ресторан, сауна, риболовля.</p>
+                    <p>База відпочинку серед сосен Пущі-Водиці. Номери, ресторан, сауна, риболовля та події в атмосфері заміського комфорту.</p>
                 </div>
                 <div class="footer-links">
                     <h5>Навігація</h5>
                     <a href="#about">Про нас</a>
                     <a href="#rooms">Номери</a>
-                    <a href="#restaurant">Ресторан</a>
-                    <a href="#services">Послуги</a>
+                    <a href="#gallery">Галерея</a>
+                    <a href="#menu">Меню</a>
                     <a href="#booking">Бронювання</a>
                 </div>
                 <div class="footer-contacts">
@@ -452,7 +596,7 @@
                     <a href="tel:+380735376037">+38 (073) 537-60-37</a>
                     <a href="tel:+380985376037">+38 (098) 537-60-37</a>
                     <a href="mailto:info@yulimo.kyiv.ua">info@yulimo.kyiv.ua</a>
-                    <a href="https://t.me/yulimo" target="_blank">✈️ Telegram</a>
+                    <span class="footer-placeholder">✈️ Telegram — скоро</span>
                 </div>
             </div>
             <div class="footer-bottom">
