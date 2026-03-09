@@ -139,11 +139,11 @@
                 <div class="booking-field">
                     <label>Гості</label>
                     <select id="guests">
-                        <option>1 гість</option>
-                        <option selected>2 гості</option>
-                        <option>3 гості</option>
-                        <option>4 гості</option>
-                        <option>5+ гостей</option>
+                        <option value="1">1 гість</option>
+                        <option value="2" selected>2 гості</option>
+                        <option value="3">3 гості</option>
+                        <option value="4">4 гості</option>
+                        <option value="5">5+ гостей</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Перевірити доступність</button>
@@ -156,9 +156,10 @@
             <div class="about-grid">
                 <div class="about-text">
                     <p class="section-label">Про нас</p>
-                    <h2 class="section-title">Місце, де природа<br>зустрічає сервіс</h2>
-                    <p class="about-desc">Юлімо — це відпочинок серед соснового лісу Пущі-Водиці, де можна переключитися з міського ритму на спокій, свіже повітря і теплу атмосферу заміського комплексу.</p>
-                    <p class="about-desc">Ми створюємо простір для вихідних удвох, відпочинку всією родиною, камерних святкувань та корпоративних подій без зайвого шуму і метушні.</p>
+                    <h2 class="section-title">Юлімо — місце, куди їдуть не просто переночувати, а видихнути по-справжньому</h2>
+                    <p class="about-desc">У ритмі великого міста складно знайти простір, де можна по-справжньому сповільнитися. Саме тому Юлімо створене як заміський формат відпочинку, де замість шуму доріг — сосни, замість поспіху — довгі сніданки, а замість втоми — відчуття, що ви нарешті повернулися до себе.</p>
+                    <p class="about-desc">Сюди приїжджають за романтичними вихідними, теплими сімейними днями, камерними святкуваннями та тихими вечорами біля ресторану й тераси. Ми поєднали природну атмосферу Пущі-Водиці з комфортом, сервісом і настроєм, який хочеться переживати знову.</p>
+                    <p class="about-desc">Юлімо — це не просто база відпочинку. Це локація для особливих моментів: ранкова кава серед лісу, вечеря при м’якому світлі, відновлення в сауні, неспішні прогулянки територією й відчуття, що хороший відпочинок може бути поруч, без далеких переїздів і зайвого клопоту.</p>
                     <div class="about-stats">
                         <div class="stat">
                             <span class="stat-num">15</span>
@@ -170,30 +171,30 @@
                         </div>
                         <div class="stat">
                             <span class="stat-num">24/7</span>
-                            <span class="stat-label">піклування про гостей</span>
+                            <span class="stat-label">увага до деталей</span>
                         </div>
                     </div>
                 </div>
                 <div class="about-features">
                     <div class="feature-card reveal">
                         <div class="feature-icon">🌲</div>
-                        <h3>Сосновий ліс</h3>
-                        <p>Тиша, чисте повітря та відчуття, ніби ви далеко за містом, хоча Київ зовсім поруч.</p>
+                        <h3>Атмосфера лісу</h3>
+                        <p>Чисте повітря, тиша й відчуття заміського спокою, яке з перших хвилин переключає з міського ритму.</p>
                     </div>
                     <div class="feature-card reveal">
                         <div class="feature-icon">🍽️</div>
-                        <h3>Справжня кухня</h3>
-                        <p>Теплі сніданки, сімейні вечері, банкетні столи та сезонні страви для будь-якого формату відпочинку.</p>
+                        <h3>Смак відпочинку</h3>
+                        <p>Ресторан для красивих сніданків, сімейних вечерь, камерних свят і теплих зустрічей без поспіху.</p>
                     </div>
                     <div class="feature-card reveal">
                         <div class="feature-icon">🛖</div>
-                        <h3>Номери і котеджі</h3>
-                        <p>Формати проживання для пар, сімей, друзів і гостей, які цінують приватність.</p>
+                        <h3>Проживання з настроєм</h3>
+                        <p>Номери та котеджі, де легко усамітнитися, провести вихідні удвох або зібрати близьких на кілька днів.</p>
                     </div>
                     <div class="feature-card reveal">
                         <div class="feature-icon">✨</div>
-                        <h3>Події та релакс</h3>
-                        <p>Сауна, риболовля, камерні святкування, відпочинок на природі та затишні вечори.</p>
+                        <h3>Місце для моментів</h3>
+                        <p>Від романтичного вечора до сімейного святкування — простір, який підлаштовується під ваш формат відпочинку.</p>
                     </div>
                 </div>
             </div>
@@ -472,51 +473,62 @@
     <section class="section" id="booking">
         <div class="container">
             <div class="section-header">
-                <p class="section-label">Онлайн</p>
-                <h2 class="section-title">Забронювати номер</h2>
-                <p class="section-subtitle">Залиште заявку, і ми зв’яжемося з вами для уточнення деталей проживання, столика або події.</p>
+                <p class="section-label">Онлайн бронювання</p>
+                <h2 class="section-title">Забронювати номер прямо на сайті</h2>
+                <p class="section-subtitle">Оберіть номер, дати та кількість гостей — заявка буде відправлена в реальну систему бронювання через API.</p>
             </div>
             <form class="booking-form" id="bookingForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Ім’я та прізвище</label>
-                        <input type="text" placeholder="Наприклад, Іваненко Олег" required>
+                        <label for="bookingGuestName">Ім’я та прізвище</label>
+                        <input type="text" id="bookingGuestName" placeholder="Наприклад, Іваненко Олег" required>
                     </div>
                     <div class="form-group">
-                        <label>Телефон</label>
-                        <input type="tel" placeholder="+38 (0__) ___-__-__" required>
+                        <label for="bookingGuestPhone">Телефон</label>
+                        <input type="tel" id="bookingGuestPhone" placeholder="+38 (0__) ___-__-__" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" placeholder="your@email.com">
+                        <label for="bookingGuestEmail">Email</label>
+                        <input type="email" id="bookingGuestEmail" placeholder="your@email.com">
                     </div>
                     <div class="form-group">
-                        <label>Формат запиту</label>
-                        <select>
-                            <option>Стандартний номер</option>
-                            <option>Люкс сюіт</option>
-                            <option>Котедж</option>
-                            <option>Столик у ресторані</option>
-                            <option>Банкет / подія</option>
+                        <label for="bookingRoomId">Оберіть номер</label>
+                        <select id="bookingRoomId" required>
+                            <option value="">Завантажуємо доступні номери...</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Дата заїзду</label>
-                        <input type="date" required>
+                        <label for="bookingCheckIn">Дата заїзду</label>
+                        <input type="date" id="bookingCheckIn" required>
                     </div>
                     <div class="form-group">
-                        <label>Дата виїзду</label>
-                        <input type="date" required>
+                        <label for="bookingCheckOut">Дата виїзду</label>
+                        <input type="date" id="bookingCheckOut" required>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Коментар</label>
-                    <textarea rows="3" placeholder="Побажання, кількість гостей, формат події, питання щодо меню..."></textarea>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookingGuestsCount">Кількість гостей</label>
+                        <select id="bookingGuestsCount" required>
+                            <option value="1">1 гість</option>
+                            <option value="2" selected>2 гості</option>
+                            <option value="3">3 гості</option>
+                            <option value="4">4 гості</option>
+                            <option value="5">5 гостей</option>
+                            <option value="6">6+ гостей</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingComment">Коментар</label>
+                        <input type="text" id="bookingComment" placeholder="Побажання до номера, часу заїзду або деталей відпочинку">
+                    </div>
                 </div>
+                <div class="booking-note">Після відправки ви отримаєте підтвердження на екрані. Менеджер зв’яжеться з вами для фінального узгодження деталей.</div>
+                <div class="form-status" id="bookingStatus" aria-live="polite"></div>
                 <button type="submit" class="btn btn-primary btn-lg btn-full">Надіслати заявку</button>
             </form>
         </div>
