@@ -165,18 +165,20 @@ body {
 .hero-bg {
     position: absolute;
     inset: 0;
+    z-index: 0;
     background: linear-gradient(135deg, #0e2318 0%, #1a3a2a 40%, #2d5a3d 100%);
 }
 
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 30% 50%, rgba(76,175,80,0.08) 0%, transparent 60%);
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.45);
 }
 
 .hero-content {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     padding-top: 80px;
 }
 
@@ -208,6 +210,8 @@ body {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 4;
 }
 
 .hero-scroll {
@@ -215,19 +219,21 @@ body {
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.4);
     font-size: 0.75rem;
     letter-spacing: 2px;
+    pointer-events: none;
 }
 
 .scroll-line {
     width: 1px;
     height: 40px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
     animation: scrollAnim 1.8s ease-in-out infinite;
 }
 
