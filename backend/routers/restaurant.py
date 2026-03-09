@@ -1,25 +1,33 @@
-from fastapi import APIRouter, Depends, HTTPException
+"""Маршрути ресторану: меню та резервація столиків."""
+
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
 
 from database import get_db
-from models.restaurant import MenuItem, TableReservation
+from schemas.restaurant import TableReservationCreate, TableReservationResponse
+from services.restaurant_service import (
+    create_table_reservation,
+    get_menu,
+)
 
 router = APIRouter()
 
 
 @router.get("/menu")
-def get_menu(category: Optional[str] = None, db: Session = Depends(get_db)):
-    query = db.query(MenuItem).filter(MenuItem.is_active == True)
-    if category:
-        query = query.filter(MenuItem.category == category)
-    return query.all()
+def get_menu_endpoint(category: Optional[str] = None, db: Session = Depends(get_db)):
+    """Меню ресторану (опціональний фільтр за категорією)."""
+    return get_menu(db, category)
 
 
-@router.post("/reserve-table")
-def reserve_table(data: dict, db: Session = Depends(get_db)):
-    reservation = TableReservation(**data)
-    db.add(reservation)
-    db.commit()
-    db.refresh(reservation)
-    return {"success": True, "id": reservation.id}
+@router.post(
+    "/reserve-table",
+    response_model=TableReservationResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def reserve_table(data: TableReservationCreate, db: Session = Depends(get_db)):
+    """Резервація столика в ресторані."""
+    reservation = create_table_reservation(data, db)
+    return reservation
+
