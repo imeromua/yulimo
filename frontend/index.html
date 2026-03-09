@@ -3,108 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Юлімо — База відпочинку · Пуща-Водиця</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Georgia', serif;
-            background: #0e2318;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-        .logo {
-            font-size: 5rem;
-            margin-bottom: 10px;
-        }
-        h1 {
-            font-size: 3.5rem;
-            color: #c8e6c9;
-            letter-spacing: 4px;
-            margin-bottom: 8px;
-        }
-        .subtitle {
-            font-size: 1.1rem;
-            color: #81c784;
-            letter-spacing: 2px;
-            margin-bottom: 40px;
-        }
-        .divider {
-            width: 60px;
-            height: 2px;
-            background: #4caf50;
-            margin: 0 auto 40px;
-        }
-        .coming-soon {
-            font-size: 1.3rem;
-            color: #a5d6a7;
-            margin-bottom: 50px;
-        }
-        .features {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 50px;
-        }
-        .feature {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 20px 25px;
-            min-width: 140px;
-        }
-        .feature .icon { font-size: 2rem; margin-bottom: 8px; }
-        .feature .label { font-size: 0.9rem; color: #a5d6a7; }
-        .contacts {
-            font-size: 0.95rem;
-            color: #66bb6a;
-            line-height: 2;
-        }
-        .contacts a {
-            color: #81c784;
-            text-decoration: none;
-        }
-        .contacts a:hover { text-decoration: underline; }
-        @media (max-width: 480px) {
-            h1 { font-size: 2.5rem; }
-            .logo { font-size: 3.5rem; }
-        }
-    </style>
+    <title>Юлімо — База відпочинку · Пуща-Водиця · Київ</title>
+    <meta name="description" content="База відпочинку Юлімо — затишок серед сосен Пущі-Водиці поруч Києва. Номери, ресторан, сауна, риболовля.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="logo">🌲</div>
-    <h1>ЮЛІМО</h1>
-    <p class="subtitle">БАЗА ВІДПОЧИНКУ · ПУЩА-ВОДИЦЯ · КИЇВ</p>
-    <div class="divider"></div>
-    <p class="coming-soon">Сайт у розробці — незабаром відкриємось!</p>
-    <div class="features">
-        <div class="feature">
-            <div class="icon">🛏</div>
-            <div class="label">Номери<br>та котеджі</div>
+
+    <!-- NAVIGATION -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-inner">
+            <a href="#" class="logo">
+                <span class="logo-icon">🌲</span>
+                <span class="logo-text">ЮЛІМО</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about">Про нас</a></li>
+                <li><a href="#rooms">Номери</a></li>
+                <li><a href="#restaurant">Ресторан</a></li>
+                <li><a href="#services">Послуги</a></li>
+                <li><a href="#contacts">Контакти</a></li>
+            </ul>
+            <a href="#booking" class="btn btn-primary nav-btn">Забронювати</a>
+            <button class="burger" id="burger" aria-label="Меню">
+                <span></span><span></span><span></span>
+            </button>
         </div>
-        <div class="feature">
-            <div class="icon">🍽</div>
-            <div class="label">Ресторан<br>та кухня</div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <p class="hero-label">Пуща-Водиця · Київ</p>
+            <h1 class="hero-title">Відпочинок<br>&#x441;&#x435;&#x440;&#x435;&#x434; &#x441;&#x43e;&#x441;&#x435;&#x43d;</h1>
+            <p class="hero-subtitle">Зануртесь в лісовій казці за  15 хвилин від центру Києва</p>
+            <div class="hero-actions">
+                <a href="#booking" class="btn btn-primary btn-lg">Забронювати номер</a>
+                <a href="#rooms" class="btn btn-outline btn-lg">Переглянути номери</a>
+            </div>
         </div>
-        <div class="feature">
-            <div class="icon">🧖</div>
-            <div class="label">Сауна<br>та басейн</div>
+        <div class="hero-scroll">
+            <span>Горнутись нижче</span>
+            <div class="scroll-line"></div>
         </div>
-        <div class="feature">
-            <div class="icon">🎣</div>
-            <div class="label">Риболовля<br>та природа</div>
+    </section>
+
+    <!-- QUICK BOOKING -->
+    <section class="quick-booking">
+        <div class="container">
+            <form class="booking-bar" id="quickBookingForm">
+                <div class="booking-field">
+                    <label>Заїзд</label>
+                    <input type="date" id="checkIn" required>
+                </div>
+                <div class="booking-divider"></div>
+                <div class="booking-field">
+                    <label>Виїзд</label>
+                    <input type="date" id="checkOut" required>
+                </div>
+                <div class="booking-divider"></div>
+                <div class="booking-field">
+                    <label>Гості</label>
+                    <select id="guests">
+                        <option>1 гість</option>
+                        <option selected>2 гості</option>
+                        <option>3 гості</option>
+                        <option>4 гості</option>
+                        <option>5+ гостей</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Перевірити доступність</button>
+            </form>
         </div>
-    </div>
-    <div class="contacts">
-        <p>📍 Пуща-Водиця, Київ</p>
-        <p>📞 <a href="tel:+380000000000">+38 (000) 000-00-00</a></p>
-        <p>✉️ <a href="mailto:info@yulimo.kyiv.ua">info@yulimo.kyiv.ua</a></p>
-    </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text">
+                    <p class="section-label">Про нас</p>
+                    <h2 class="section-title">Місце, де природа<br>зустрічає комфорт</h2>
+                    <p class="about-desc">Юлімо — це затишок серед соснового лісу Пущі-Водиці. Ми запрошуємо вас відпочити від міської суети в оточенні чистого повітря, шуму сосен і співу птахів.</p>
+                    <div class="about-stats">
+                        <div class="stat">
+                            <span class="stat-num">15</span>
+                            <span class="stat-label">хвилин від Києва</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-num">12</span>
+                            <span class="stat-label">номерів і котеджів</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-num">4★</span>
+                            <span class="stat-label">рейтинг гостей</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-features">
+                    <div class="feature-card">
+                        <div class="feature-icon">🌲</div>
+                        <h3>Сосновий ліс</h3>
+                        <p>Чисте повітря природного лісового парку</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🍽️</div>
+                        <h3>Домашня кухня</h3>
+                        <p>Страви з місцевих свіжих продуктів</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🧖</div>
+                        <h3>Сауна та СПА</h3>
+                        <p>Розслабтесь після насиченого дня</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎣</div>
+                        <h3>Риболовля</h3>
+                        <p>Власне озеро на території</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROOMS -->
+    <section class="section section-dark" id="rooms">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-label">Розміщення</p>
+                <h2 class="section-title">Номери та котеджі</h2>
+            </div>
+            <div class="rooms-grid" id="roomsGrid">
+                <div class="room-card">
+                    <div class="room-photo" style="background:#2d5a3d">
+                        <div class="room-photo-placeholder">🏡</div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-header">
+                            <h3>Стандартний номер</h3>
+                            <div class="room-price">від <strong>1200</strong> грн/ніч</div>
+                        </div>
+                        <div class="room-meta">
+                            <span>👥 2-3 гості</span>
+                            <span>📍 25 м²</span>
+                            <span>🛏 2 ліжка</span>
+                        </div>
+                        <div class="room-amenities">
+                            <span>Wi-Fi</span><span>TV</span><span>Душ</span><span>Кондиціонер</span>
+                        </div>
+                        <a href="#booking" class="btn btn-outline btn-sm">Забронювати</a>
+                    </div>
+                </div>
+                <div class="room-card featured">
+                    <div class="room-badge">Популярний</div>
+                    <div class="room-photo" style="background:#1a3a2a">
+                        <div class="room-photo-placeholder">🏠</div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-header">
+                            <h3>Котедж</h3>
+                            <div class="room-price">від <strong>2800</strong> грн/ніч</div>
+                        </div>
+                        <div class="room-meta">
+                            <span>👥 4-6 гостей</span>
+                            <span>📍 60 м²</span>
+                            <span>🛏 3 кімнати</span>
+                        </div>
+                        <div class="room-amenities">
+                            <span>Wi-Fi</span><span>TV</span><span>Кухня</span><span>Мангал</span><span>Паркінг</span>
+                        </div>
+                        <a href="#booking" class="btn btn-primary btn-sm">Забронювати</a>
+                    </div>
+                </div>
+                <div class="room-card">
+                    <div class="room-photo" style="background:#3d5a2d">
+                        <div class="room-photo-placeholder">🛌</div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-header">
+                            <h3>Люкс сюіт</h3>
+                            <div class="room-price">від <strong>2000</strong> грн/ніч</div>
+                        </div>
+                        <div class="room-meta">
+                            <span>👥 2-4 гості</span>
+                            <span>📍 45 м²</span>
+                            <span>🛏 2 кімнати</span>
+                        </div>
+                        <div class="room-amenities">
+                            <span>Wi-Fi</span><span>TV</span><span>Джакузі</span><span>Тераса</span>
+                        </div>
+                        <a href="#booking" class="btn btn-outline btn-sm">Забронювати</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RESTAURANT -->
+    <section class="section" id="restaurant">
+        <div class="container">
+            <div class="restaurant-grid">
+                <div class="restaurant-text">
+                    <p class="section-label">Гастрономія</p>
+                    <h2 class="section-title">Ресторан<br>«Сосновий дім»</h2>
+                    <p>Домашня українська кухня з місцевих продуктів. Риба з власного озера, свіжі овочі з грядки, домашня випічка.</p>
+                    <ul class="restaurant-features">
+                        <li>✨ Сезонне меню з місцевих продуктів</li>
+                        <li>🔥 Гриль та банкетне обслуговування</li>
+                        <li>🍾 Власна випічка щодня</li>
+                        <li>🍷 Вибір вин та напоїв</li>
+                    </ul>
+                    <div class="restaurant-actions">
+                        <a href="#" class="btn btn-primary">Переглянути меню</a>
+                        <a href="#" class="btn btn-outline">Забронювати столик</a>
+                    </div>
+                </div>
+                <div class="restaurant-visual">
+                    <div class="restaurant-img-placeholder">
+                        <span>🍽️</span>
+                        <p>Фото ресторану</p>
+                    </div>
+                    <div class="restaurant-hours">
+                        <h4>Години роботи</h4>
+                        <div class="hours-row"><span>Пн — Пт</span><span>12:00 — 23:00</span></div>
+                        <div class="hours-row"><span>Сб — Нд</span><span>10:00 — 00:00</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="section section-dark" id="services">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-label">Дозвілля</p>
+                <h2 class="section-title">Послуги</h2>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🧖</div>
+                    <h3>Сауна</h3>
+                    <p>Фінська сауна з преміальними ароматами</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🌊</div>
+                    <h3>Басейн</h3>
+                    <p>Відкритий басейн з підігрівом літом</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔥</div>
+                    <h3>Мангальна зона</h3>
+                    <p>Обладнані зони для барбекю</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🎣</div>
+                    <h3>Риболовля</h3>
+                    <p>Власне озеро з рибою на території</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">👶</div>
+                    <h3>Дитячий майданчик</h3>
+                    <p>Безпечне дозвілля для дітей</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🎉</div>
+                    <h3>Корпоративи</h3>
+                    <p>Організація свят та корпоративних подій</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BOOKING FORM -->
+    <section class="section" id="booking">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-label">Онлайн</p>
+                <h2 class="section-title">Забронювати номер</h2>
+            </div>
+            <form class="booking-form" id="bookingForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ім’я та прізвище</label>
+                        <input type="text" placeholder="Наприклад, Іваненко Олег" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Телефон</label>
+                        <input type="tel" placeholder="+38 (0__) ___-__-__" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Тип номеру</label>
+                        <select>
+                            <option>Стандартний номер</option>
+                            <option>Люкс сюіт</option>
+                            <option>Котедж</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Дата заїзду</label>
+                        <input type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Дата виїзду</label>
+                        <input type="date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Коментар</label>
+                    <textarea rows="3" placeholder="Побажання, запитання..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-full">Надіслати заявку</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- CONTACTS -->
+    <section class="section section-dark" id="contacts">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-label">Зв’язок</p>
+                <h2 class="section-title">Як нас знайти</h2>
+            </div>
+            <div class="contacts-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div>
+                            <h4>Адреса</h4>
+                            <p>Пуща-Водиця, Київ</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <div>
+                            <h4>Телефон</h4>
+                            <p><a href="tel:+380000000000">+38 (000) 000-00-00</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">✉️</div>
+                        <div>
+                            <h4>Email</h4>
+                            <p><a href="mailto:info@yulimo.kyiv.ua">info@yulimo.kyiv.ua</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-socials">
+                        <a href="#" class="social-btn">Instagram</a>
+                        <a href="#" class="social-btn">Facebook</a>
+                        <a href="#" class="social-btn">Telegram</a>
+                    </div>
+                </div>
+                <div class="contact-map">
+                    <div class="map-placeholder">
+                        <span>🗺️</span>
+                        <p>Карта проїзду</p>
+                        <small>Пуща-Водиця, Київ</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-logo">
+                <span>🌲</span> ЮЛІМО
+            </div>
+            <p class="footer-copy">База відпочинку «Юлімо» · Пуща-Водиця, Київ · © 2026</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
 </body>
 </html>
