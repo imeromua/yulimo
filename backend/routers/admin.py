@@ -1,33 +1,53 @@
-from fastapi import APIRouter, Depends, HTTPException
+"""Адміністративні маршрути (захищені JWT + роллю admin)."""
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
 
 from database import get_db
-from models.booking import Booking, BookingStatus
-from models.restaurant import TableReservation
+from dependencies.auth import require_admin
+from models.booking import BookingStatus
+from models.user import User
+from services.booking_service import (
+    BookingNotFoundError,
+    BookingConflictError,
+    RoomNotFoundError,
+    get_all_bookings,
+    update_booking_status,
+)
+from services.restaurant_service import get_all_table_reservations
 
 router = APIRouter()
 
 
 @router.get("/bookings")
-def get_all_bookings(db: Session = Depends(get_db)):
-    return db.query(Booking).order_by(Booking.created_at.desc()).all()
+def get_all_bookings_endpoint(
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Усі бронювання (тільки для адміністраторів)."""
+    return get_all_bookings(db)
 
 
 @router.patch("/bookings/{booking_id}/status")
-def update_booking_status(
+def update_booking_status_endpoint(
     booking_id: int,
     status: BookingStatus,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
 ):
-    booking = db.query(Booking).filter(Booking.id == booking_id).first()
-    if not booking:
-        raise HTTPException(status_code=404, detail="Бронювання не знайдено")
-    booking.status = status
-    db.commit()
+    """Оновити статус бронювання (тільки для адміністраторів)."""
+    try:
+        update_booking_status(booking_id, status, db)
+    except BookingNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
     return {"success": True}
 
 
 @router.get("/table-reservations")
-def get_table_reservations(db: Session = Depends(get_db)):
-    return db.query(TableReservation).order_by(TableReservation.created_at.desc()).all()
+def get_table_reservations_endpoint(
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Усі резервації столиків (тільки для адміністраторів)."""
+    return get_all_table_reservations(db)
+

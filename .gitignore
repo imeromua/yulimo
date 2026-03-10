@@ -11,3 +11,19 @@ venv/
 # Logs
 logs/
 *.log
+
+# Test databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# pytest cache
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Docker
+.dockerignore
