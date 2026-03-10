@@ -12,10 +12,8 @@ const API_BASE = '/api';
  * @returns {Promise<any>}
  */
 async function apiFetch(path, options = {}) {
-    const defaults = {
-        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    };
-    const resp = await fetch(path, { ...defaults, ...options, headers: { ...defaults.headers, ...(options.headers || {}) } });
+    const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+    const resp = await fetch(path, { ...options, headers });
     const json = await resp.json().catch(() => ({}));
     if (!resp.ok) {
         const msg = json?.detail || json?.error || `HTTP ${resp.status}`;

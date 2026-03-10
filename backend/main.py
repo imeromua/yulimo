@@ -16,6 +16,7 @@ from core.logging_config import error_logger, setup_logging
 from middleware.logging_mw import RequestLoggingMiddleware
 from middleware.security import SecurityHeadersMiddleware
 from routers import admin, auth, bookings, restaurant, rooms
+from utils.responses import make_serializable_errors
 
 # ---------------------------------------------------------------------------
 # Логування
@@ -63,23 +64,13 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    # Перетворюємо ctx['error'] на рядки, щоб уникнути проблем серіалізації
-    def _make_serializable(errors):
-        result = []
-        for e in errors:
-            err = dict(e)
-            if "ctx" in err:
-                err["ctx"] = {k: str(v) for k, v in err["ctx"].items()}
-            result.append(err)
-        return result
-
     error_logger.warning("Помилка валідації для %s: %s", request.url.path, exc.errors())
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "success": False,
             "error": "Помилка валідації вхідних даних",
-            "details": _make_serializable(exc.errors()),
+            "details": make_serializable_errors(exc.errors()),
         },
     )
 

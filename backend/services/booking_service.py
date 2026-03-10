@@ -19,6 +19,10 @@ class RoomNotFoundError(Exception):
     pass
 
 
+class BookingNotFoundError(Exception):
+    pass
+
+
 class InvalidDatesError(Exception):
     pass
 
@@ -99,7 +103,7 @@ def update_booking_status(
     """Оновлює статус бронювання."""
     booking = db.query(Booking).filter(Booking.id == booking_id).first()
     if not booking:
-        raise RoomNotFoundError("Бронювання не знайдено")
+        raise BookingNotFoundError("Бронювання не знайдено")
     booking.status = status
     db.commit()
     db.refresh(booking)

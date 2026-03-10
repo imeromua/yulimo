@@ -30,7 +30,6 @@ def setup_logging(debug: bool = False) -> None:
     # Зменшуємо шум від сторонніх бібліотек
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
-    logging.getLogger("passlib").setLevel(logging.WARNING)
 
 
 # Іменовані логери для різних підсистем

@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 # Додаємо backend до PYTHONPATH
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
-# SQLite в пам'яті для ізольованих тестів
+# SQLite файловий для тестів (між session-scope та function-scope fixtures)
 SQLITE_URL = "sqlite:///./test_yulimo.db"
 
 # Встановлюємо до імпорту main, щоб Settings зчитали правильний URL

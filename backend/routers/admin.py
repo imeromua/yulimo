@@ -8,6 +8,8 @@ from dependencies.auth import require_admin
 from models.booking import BookingStatus
 from models.user import User
 from services.booking_service import (
+    BookingNotFoundError,
+    BookingConflictError,
     RoomNotFoundError,
     get_all_bookings,
     update_booking_status,
@@ -36,7 +38,7 @@ def update_booking_status_endpoint(
     """Оновити статус бронювання (тільки для адміністраторів)."""
     try:
         update_booking_status(booking_id, status, db)
-    except RoomNotFoundError as exc:
+    except BookingNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
     return {"success": True}
 
