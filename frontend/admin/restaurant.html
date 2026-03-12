@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ресторан — Адмін-панель Юлімо</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/admin/bookings.html" class="sidebar-logo">ЮЛІМО</a>
+            <div class="sidebar-label">Адмін-панель</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin/bookings.html">
+                <span class="nav-icon">📋</span> Бронювання
+            </a>
+            <a href="/admin/rooms.html">
+                <span class="nav-icon">🏠</span> Номери
+            </a>
+            <a href="/admin/restaurant.html" class="active">
+                <span class="nav-icon">🍽️</span> Ресторан
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebarUser">—</div>
+            <button class="btn btn-secondary btn-block" id="logoutBtn">Вийти</button>
+        </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Main content -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <button class="burger-btn" id="burgerBtn" aria-label="Меню">
+                <span></span><span></span><span></span>
+            </button>
+            <span class="topbar-title">Ресторан</span>
+            <div class="topbar-actions">
+                <button class="btn btn-primary btn-sm" id="refreshBtn">↻ Оновити</button>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <div id="alertBox" class="alert"></div>
+
+            <!-- ── MENU ───────────────────────────────────────── -->
+            <div class="section-header">
+                <h2>Меню</h2>
+                <button class="btn btn-primary btn-sm" id="addMenuBtn">+ Додати страву</button>
+            </div>
+
+            <!-- Category filter -->
+            <div class="filters" style="margin-bottom:16px">
+                <span class="filter-label">Категорія:</span>
+                <select class="filter-select" id="menuCategoryFilter">
+                    <option value="">Усі</option>
+                    <option value="starters">Закуски</option>
+                    <option value="soups">Супи</option>
+                    <option value="mains">Основні страви</option>
+                    <option value="grill">Гриль</option>
+                    <option value="desserts">Десерти</option>
+                    <option value="drinks">Напої</option>
+                </select>
+            </div>
+
+            <div class="table-wrap" style="margin-bottom:36px">
+                <table id="menuTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Назва</th>
+                            <th>Категорія</th>
+                            <th>Ціна</th>
+                            <th>Вага</th>
+                            <th>Опис</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menuTbody">
+                        <tr class="loading-row">
+                            <td colspan="7"><span class="spinner"></span> Завантаження…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ── TABLE RESERVATIONS ─────────────────────────── -->
+            <div class="section-header">
+                <h2>Резервації столиків</h2>
+                <button class="btn btn-secondary btn-sm" id="refreshReservationsBtn">↻ Оновити</button>
+            </div>
+
+            <div class="table-wrap">
+                <table id="reservationsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Гість</th>
+                            <th>Телефон</th>
+                            <th>Дата</th>
+                            <th>Час</th>
+                            <th>Осіб</th>
+                            <th>Коментар</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservationsTbody">
+                        <tr class="loading-row">
+                            <td colspan="8"><span class="spinner"></span> Завантаження…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Add menu item panel -->
+<div class="panel-overlay" id="menuPanel">
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Додати страву</h3>
+            <button class="panel-close" id="closePanelBtn" aria-label="Закрити">&times;</button>
+        </div>
+        <div class="panel-body">
+            <div id="panelAlert" class="alert"></div>
+            <form id="menuForm" novalidate>
+
+                <div class="form-group">
+                    <label for="menuName">Назва *</label>
+                    <input type="text" id="menuName" placeholder="Борщ домашній" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="menuCategory">Категорія *</label>
+                        <select id="menuCategory" required>
+                            <option value="">— Оберіть —</option>
+                            <option value="starters">Закуски</option>
+                            <option value="soups">Супи</option>
+                            <option value="mains">Основні страви</option>
+                            <option value="grill">Гриль</option>
+                            <option value="desserts">Десерти</option>
+                            <option value="drinks">Напої</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="menuPrice">Ціна (₴) *</label>
+                        <input type="number" id="menuPrice" placeholder="180" min="0.01" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="menuWeight">Вага / об'єм</label>
+                    <input type="text" id="menuWeight" placeholder="350 г">
+                </div>
+
+                <div class="form-group">
+                    <label for="menuDesc">Опис</label>
+                    <textarea id="menuDesc" rows="3" placeholder="Традиційний борщ з пампушками…"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="menuPhoto">Фото URL</label>
+                    <input type="text" id="menuPhoto" placeholder="https://…/borscht.jpg">
+                </div>
+
+            </form>
+        </div>
+        <div class="panel-footer">
+            <button class="btn btn-secondary" id="cancelMenuBtn">Скасувати</button>
+            <button class="btn btn-primary" id="saveMenuBtn">Зберегти</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+    import { requireAuth, logout } from './js/auth.js';
+    import { getMenu, addMenuItem, getTableReservations } from './js/api.js';
+
+    if (!requireAuth()) { /* redirected */ }
+
+    /* ── UI refs ─── */
+    const alertBox        = document.getElementById('alertBox');
+    const menuTbody       = document.getElementById('menuTbody');
+    const reservTbody     = document.getElementById('reservationsTbody');
+    const menuPanel       = document.getElementById('menuPanel');
+    const panelAlert      = document.getElementById('panelAlert');
+    const sidebar         = document.getElementById('sidebar');
+    const mobileOverlay   = document.getElementById('mobileOverlay');
+
+    /* ── Helpers ─── */
+    function esc(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function toast(msg, type = 'success') {
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    function showAlert(msg, type = 'error') {
+        alertBox.textContent = msg;
+        alertBox.className = `alert alert-${type} show`;
+        setTimeout(() => { alertBox.className = 'alert'; }, 4500);
+    }
+
+    function showPanelAlert(msg, type = 'error') {
+        panelAlert.textContent = msg;
+        panelAlert.className = `alert alert-${type} show`;
+    }
+
+    function hidePanelAlert() {
+        panelAlert.className = 'alert';
+    }
+
+    /* ── Category labels ─── */
+    const CATEGORY_LABELS = {
+        starters: 'Закуски',
+        soups:    'Супи',
+        mains:    'Основні страви',
+        grill:    'Гриль',
+        desserts: 'Десерти',
+        drinks:   'Напої',
+    };
+
+    const RESERVATION_STATUS_LABELS = {
+        pending:   'Очікує',
+        confirmed: 'Підтверджено',
+        cancelled: 'Скасовано',
+    };
+
+    /* ── Load menu ─── */
+    async function loadMenu() {
+        const category = document.getElementById('menuCategoryFilter').value;
+        menuTbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span> Завантаження…</td></tr>';
+        try {
+            const items = await getMenu(category);
+            if (!items.length) {
+                menuTbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🍽️</div><p>Меню порожнє</p></div></td></tr>';
+                return;
+            }
+            menuTbody.innerHTML = items.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td><strong>${esc(item.name)}</strong></td>
+                    <td>${esc(CATEGORY_LABELS[item.category] || item.category)}</td>
+                    <td><span class="price">${Number(item.price).toLocaleString('uk-UA')} ₴</span></td>
+                    <td>${item.weight ? esc(item.weight) : '—'}</td>
+                    <td>${item.description ? `<span class="comment-text" title="${esc(item.description)}">${esc(item.description)}</span>` : '—'}</td>
+                    <td><span class="badge badge-${item.is_active ? 'active' : 'inactive'}">${item.is_active ? 'Активна' : 'Вимкнена'}</span></td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            menuTbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><p>Помилка: ${esc(err.message)}</p></div></td></tr>`;
+            showAlert(err.message);
+        }
+    }
+
+    /* ── Load table reservations ─── */
+    async function loadReservations() {
+        reservTbody.innerHTML = '<tr class="loading-row"><td colspan="8"><span class="spinner"></span> Завантаження…</td></tr>';
+        try {
+            const list = await getTableReservations();
+            if (!list.length) {
+                reservTbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🪑</div><p>Резервацій немає</p></div></td></tr>';
+                return;
+            }
+            reservTbody.innerHTML = list.map(r => `
+                <tr>
+                    <td>${r.id}</td>
+                    <td><span class="guest-name">${esc(r.guest_name)}</span></td>
+                    <td>${esc(r.guest_phone)}</td>
+                    <td>${r.date}</td>
+                    <td>${r.time}</td>
+                    <td>${r.guests_count}</td>
+                    <td>${r.comment ? `<span class="comment-text" title="${esc(r.comment)}">${esc(r.comment)}</span>` : '—'}</td>
+                    <td><span class="badge badge-${r.status === 'confirmed' ? 'confirmed' : r.status === 'cancelled' ? 'cancelled' : 'pending'}">
+                        ${esc(RESERVATION_STATUS_LABELS[r.status] || r.status)}
+                    </span></td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            reservTbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><p>Помилка: ${esc(err.message)}</p></div></td></tr>`;
+            showAlert(err.message);
+        }
+    }
+
+    /* ── Add menu item panel ─── */
+    document.getElementById('addMenuBtn').addEventListener('click', () => {
+        document.getElementById('menuForm').reset();
+        hidePanelAlert();
+        menuPanel.classList.add('open');
+    });
+
+    document.getElementById('closePanelBtn').addEventListener('click', () => menuPanel.classList.remove('open'));
+    document.getElementById('cancelMenuBtn').addEventListener('click', () => menuPanel.classList.remove('open'));
+
+    document.getElementById('saveMenuBtn').addEventListener('click', async () => {
+        hidePanelAlert();
+
+        const name     = document.getElementById('menuName').value.trim();
+        const category = document.getElementById('menuCategory').value;
+        const price    = parseFloat(document.getElementById('menuPrice').value);
+        const weight   = document.getElementById('menuWeight').value.trim() || null;
+        const desc     = document.getElementById('menuDesc').value.trim() || null;
+        const photo    = document.getElementById('menuPhoto').value.trim() || null;
+
+        if (!name)     { showPanelAlert('Введіть назву страви'); return; }
+        if (!category) { showPanelAlert('Оберіть категорію'); return; }
+        if (!price || price <= 0) { showPanelAlert('Введіть коректну ціну'); return; }
+
+        const saveBtn = document.getElementById('saveMenuBtn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Збереження…';
+
+        try {
+            await addMenuItem({ name, category, price, weight, description: desc, photo });
+            toast('Страву додано до меню');
+            menuPanel.classList.remove('open');
+            await loadMenu();
+        } catch (err) {
+            showPanelAlert(err.message);
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Зберегти';
+        }
+    });
+
+    /* ── Filters / refresh ─── */
+    document.getElementById('menuCategoryFilter').addEventListener('change', loadMenu);
+    document.getElementById('refreshBtn').addEventListener('click', () => { loadMenu(); loadReservations(); });
+    document.getElementById('refreshReservationsBtn').addEventListener('click', loadReservations);
+
+    /* ── Logout ─── */
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    /* ── Burger ─── */
+    document.getElementById('burgerBtn').addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        mobileOverlay.classList.toggle('open');
+    });
+    mobileOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        mobileOverlay.classList.remove('open');
+    });
+
+    /* ── Init ─── */
+    loadMenu();
+    loadReservations();
+</script>
+</body>
+</html>

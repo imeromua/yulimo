@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронювання — Адмін-панель Юлімо</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/admin/bookings.html" class="sidebar-logo">ЮЛІМО</a>
+            <div class="sidebar-label">Адмін-панель</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin/bookings.html" class="active">
+                <span class="nav-icon">📋</span> Бронювання
+            </a>
+            <a href="/admin/rooms.html">
+                <span class="nav-icon">🏠</span> Номери
+            </a>
+            <a href="/admin/restaurant.html">
+                <span class="nav-icon">🍽️</span> Ресторан
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebarUser">—</div>
+            <button class="btn btn-secondary btn-block" id="logoutBtn">Вийти</button>
+        </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Main content -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <button class="burger-btn" id="burgerBtn" aria-label="Меню">
+                <span></span><span></span><span></span>
+            </button>
+            <span class="topbar-title">Бронювання</span>
+            <div class="topbar-actions">
+                <button class="btn btn-primary btn-sm" id="refreshBtn">↻ Оновити</button>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- Stats -->
+            <div class="stats-row" id="statsRow">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotal">—</div>
+                    <div class="stat-label">Усього</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statPending">—</div>
+                    <div class="stat-label">Очікують</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statConfirmed">—</div>
+                    <div class="stat-label">Підтверджені</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statCancelled">—</div>
+                    <div class="stat-label">Скасовані</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <span class="filter-label">Фільтр за статусом:</span>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">Усі</option>
+                    <option value="pending">Очікують</option>
+                    <option value="confirmed">Підтверджені</option>
+                    <option value="cancelled">Скасовані</option>
+                    <option value="completed">Завершені</option>
+                </select>
+            </div>
+
+            <!-- Alert -->
+            <div id="alertBox" class="alert"></div>
+
+            <!-- Table -->
+            <div class="table-wrap">
+                <table id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Гість</th>
+                            <th>Телефон</th>
+                            <th>Email</th>
+                            <th>Номер</th>
+                            <th>Заїзд</th>
+                            <th>Виїзд</th>
+                            <th>Ночей</th>
+                            <th>Сума</th>
+                            <th>Статус</th>
+                            <th>Коментар</th>
+                            <th>Дія</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTbody">
+                        <tr class="loading-row">
+                            <td colspan="12">
+                                <span class="spinner"></span>
+                                Завантаження…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+    import { requireAuth, logout, getToken } from './js/auth.js';
+    import { getBookings, updateBookingStatus } from './js/api.js';
+
+    if (!requireAuth()) { /* redirected */ }
+
+    /* ── UI helpers ─── */
+    const tbody      = document.getElementById('bookingsTbody');
+    const filter     = document.getElementById('statusFilter');
+    const alertBox   = document.getElementById('alertBox');
+    const sidebar    = document.getElementById('sidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+
+    function showAlert(msg, type = 'error') {
+        alertBox.textContent = msg;
+        alertBox.className = `alert alert-${type} show`;
+        setTimeout(() => { alertBox.className = 'alert'; }, 4000);
+    }
+
+    function toast(msg, type = 'success') {
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    /* ── Status badge ─── */
+    const STATUS_LABELS = {
+        pending:   'Очікує',
+        confirmed: 'Підтверджено',
+        cancelled: 'Скасовано',
+        completed: 'Завершено',
+    };
+
+    function badgeHTML(status) {
+        const label = STATUS_LABELS[status] || status;
+        return `<span class="badge badge-${status}">${label}</span>`;
+    }
+
+    /* ── Action buttons per status ─── */
+    function actionsHTML(booking) {
+        const { id, status } = booking;
+        const btns = [];
+
+        if (status === 'pending') {
+            btns.push(`<button class="btn btn-success btn-sm" data-id="${id}" data-status="confirmed">✓ Підтвердити</button>`);
+            btns.push(`<button class="btn btn-danger btn-sm" data-id="${id}" data-status="cancelled">✗ Скасувати</button>`);
+        }
+        if (status === 'confirmed') {
+            btns.push(`<button class="btn btn-primary btn-sm" data-id="${id}" data-status="completed">✓ Завершити</button>`);
+            btns.push(`<button class="btn btn-danger btn-sm" data-id="${id}" data-status="cancelled">✗ Скасувати</button>`);
+        }
+
+        return btns.length
+            ? `<div class="status-actions">${btns.join('')}</div>`
+            : '<span style="color:#aaa;font-size:0.78rem">—</span>';
+    }
+
+    /* ── Render bookings ─── */
+    let allBookings = [];
+
+    function renderTable(bookings) {
+        if (!bookings.length) {
+            tbody.innerHTML = `<tr><td colspan="12">
+                <div class="empty-state"><div class="empty-icon">📭</div><p>Немає бронювань</p></div>
+            </td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = bookings.map(b => `
+            <tr data-id="${b.id}">
+                <td>${b.id}</td>
+                <td><span class="guest-name">${escHtml(b.guest_name)}</span></td>
+                <td>${escHtml(b.guest_phone || '—')}</td>
+                <td>${escHtml(b.guest_email || '—')}</td>
+                <td>${b.room_id ? `№${b.room_id}` : '—'}</td>
+                <td>${b.check_in || '—'}</td>
+                <td>${b.check_out || '—'}</td>
+                <td>${b.nights ?? '—'}</td>
+                <td><span class="price">${b.total_price != null ? b.total_price.toLocaleString('uk-UA') + ' ₴' : '—'}</span></td>
+                <td>${badgeHTML(b.status)}</td>
+                <td>${b.comment ? `<span class="comment-text" title="${escAttr(b.comment)}">${escHtml(b.comment)}</span>` : '—'}</td>
+                <td>${actionsHTML(b)}</td>
+            </tr>
+        `).join('');
+    }
+
+    function updateStats(bookings) {
+        document.getElementById('statTotal').textContent     = bookings.length;
+        document.getElementById('statPending').textContent   = bookings.filter(b => b.status === 'pending').length;
+        document.getElementById('statConfirmed').textContent = bookings.filter(b => b.status === 'confirmed').length;
+        document.getElementById('statCancelled').textContent = bookings.filter(b => b.status === 'cancelled').length;
+    }
+
+    /* ── Load data ─── */
+    async function loadBookings() {
+        const status = filter.value;
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="12"><span class="spinner"></span> Завантаження…</td></tr>';
+
+        try {
+            allBookings = await getBookings(status);
+            renderTable(allBookings);
+            updateStats(allBookings);
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state"><p>Помилка: ${escHtml(err.message)}</p></div></td></tr>`;
+            showAlert(err.message);
+        }
+    }
+
+    /* ── Change status ─── */
+    tbody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-status]');
+        if (!btn) return;
+
+        const id     = Number(btn.dataset.id);
+        const status = btn.dataset.status;
+
+        btn.disabled = true;
+        btn.textContent = '…';
+
+        try {
+            await updateBookingStatus(id, status);
+            toast(`Статус бронювання #${id} змінено на «${STATUS_LABELS[status]}»`);
+            await loadBookings();
+        } catch (err) {
+            toast(err.message, 'error');
+            btn.disabled = false;
+            btn.textContent = status === 'confirmed' ? '✓ Підтвердити'
+                : status === 'cancelled' ? '✗ Скасувати' : '✓ Завершити';
+        }
+    });
+
+    /* ── Filter change ─── */
+    filter.addEventListener('change', loadBookings);
+
+    /* ── Refresh button ─── */
+    document.getElementById('refreshBtn').addEventListener('click', loadBookings);
+
+    /* ── Logout ─── */
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    /* ── Burger menu ─── */
+    document.getElementById('burgerBtn').addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        mobileOverlay.classList.toggle('open');
+    });
+    mobileOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        mobileOverlay.classList.remove('open');
+    });
+
+    /* ── Escape helpers ─── */
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+    function escAttr(str) { return escHtml(str); }
+
+    /* ── Init ─── */
+    loadBookings();
+</script>
+</body>
+</html>
