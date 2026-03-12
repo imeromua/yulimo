@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід — Адмін-панель Юлімо</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="login-page">
+
+    <div class="login-card">
+        <div class="login-logo">
+            <span class="logo-text">ЮЛІМО</span>
+            <span class="admin-label">Адмін-панель</span>
+        </div>
+
+        <p class="login-title">Вхід</p>
+
+        <div id="alertBox" class="alert alert-error"></div>
+
+        <form id="loginForm" novalidate>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="admin@yulimo.kyiv.ua"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                Увійти
+            </button>
+        </form>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script type="module">
+        import { setToken, getToken } from './js/auth.js';
+        import { login } from './js/api.js';
+
+        /* If already authenticated, go to bookings */
+        if (getToken()) {
+            window.location.replace('/admin/bookings.html');
+        }
+
+        const form      = document.getElementById('loginForm');
+        const alertBox  = document.getElementById('alertBox');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showError(msg) {
+            alertBox.textContent = msg;
+            alertBox.className = 'alert alert-error show';
+        }
+
+        function hideError() {
+            alertBox.className = 'alert alert-error';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            const email    = form.email.value.trim();
+            const password = form.password.value;
+
+            if (!email || !password) {
+                showError('Введіть email і пароль');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Вхід...';
+
+            try {
+                const data = await login(email, password);
+                setToken(data.access_token);
+                window.location.replace('/admin/bookings.html');
+            } catch (err) {
+                showError(err.message || 'Помилка входу');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Увійти';
+            }
+        });
+    </script>
+</body>
+</html>

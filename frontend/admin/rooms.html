@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Номери — Адмін-панель Юлімо</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/admin/bookings.html" class="sidebar-logo">ЮЛІМО</a>
+            <div class="sidebar-label">Адмін-панель</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin/bookings.html">
+                <span class="nav-icon">📋</span> Бронювання
+            </a>
+            <a href="/admin/rooms.html" class="active">
+                <span class="nav-icon">🏠</span> Номери
+            </a>
+            <a href="/admin/restaurant.html">
+                <span class="nav-icon">🍽️</span> Ресторан
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebarUser">—</div>
+            <button class="btn btn-secondary btn-block" id="logoutBtn">Вийти</button>
+        </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Main content -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <button class="burger-btn" id="burgerBtn" aria-label="Меню">
+                <span></span><span></span><span></span>
+            </button>
+            <span class="topbar-title">Номери</span>
+            <div class="topbar-actions">
+                <button class="btn btn-primary btn-sm" id="addRoomBtn">+ Додати номер</button>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <div id="alertBox" class="alert"></div>
+
+            <!-- Rooms grid -->
+            <div class="rooms-grid" id="roomsGrid">
+                <div style="text-align:center;padding:48px;color:#8a9a8a;grid-column:1/-1">
+                    <span class="spinner"></span>
+                    Завантаження…
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Room form panel (create / edit) -->
+<div class="panel-overlay" id="roomPanel">
+    <div class="panel">
+        <div class="panel-header">
+            <h3 id="panelTitle">Додати номер</h3>
+            <button class="panel-close" id="closePanelBtn" aria-label="Закрити">&times;</button>
+        </div>
+        <div class="panel-body">
+            <div id="panelAlert" class="alert"></div>
+            <form id="roomForm" novalidate>
+                <input type="hidden" id="roomId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="roomName">Назва *</label>
+                        <input type="text" id="roomName" placeholder="Стандарт «Сосна»" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="roomType">Тип *</label>
+                        <select id="roomType" required>
+                            <option value="">— Оберіть —</option>
+                            <option value="standard">Standard</option>
+                            <option value="cottage">Cottage</option>
+                            <option value="suite">Suite</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="roomPrice">Ціна за ніч (₴) *</label>
+                        <input type="number" id="roomPrice" placeholder="1500" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="roomCapacity">Місткість</label>
+                        <input type="number" id="roomCapacity" placeholder="2" min="1" max="50" value="2">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomArea">Площа (м²)</label>
+                    <input type="number" id="roomArea" placeholder="28" min="1" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="roomDesc">Опис</label>
+                    <textarea id="roomDesc" rows="3" placeholder="Затишний номер з видом на сосновий ліс…"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomAmenities">Зручності (через кому)</label>
+                    <input type="text" id="roomAmenities" placeholder="wifi, tv, sauna, pool">
+                </div>
+
+                <div class="form-group">
+                    <label for="roomPhotos">Фото URL (через кому)</label>
+                    <input type="text" id="roomPhotos" placeholder="https://…/photo1.jpg, https://…/photo2.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="roomActive" checked style="width:auto;margin-right:6px">
+                        Номер активний
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="panel-footer">
+            <button class="btn btn-secondary" id="cancelPanelBtn">Скасувати</button>
+            <button class="btn btn-primary" id="saveRoomBtn">Зберегти</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+    import { requireAuth, logout } from './js/auth.js';
+    import { getRooms, createRoom, updateRoom } from './js/api.js';
+
+    if (!requireAuth()) { /* redirected */ }
+
+    /* ── UI refs ─── */
+    const roomsGrid    = document.getElementById('roomsGrid');
+    const alertBox     = document.getElementById('alertBox');
+    const panel        = document.getElementById('roomPanel');
+    const panelTitle   = document.getElementById('panelTitle');
+    const panelAlert   = document.getElementById('panelAlert');
+    const roomForm     = document.getElementById('roomForm');
+    const sidebar      = document.getElementById('sidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+
+    /* ── Toast ─── */
+    function toast(msg, type = 'success') {
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    function showAlert(msg, type = 'error') {
+        alertBox.textContent = msg;
+        alertBox.className = `alert alert-${type} show`;
+        setTimeout(() => { alertBox.className = 'alert'; }, 4500);
+    }
+
+    function showPanelAlert(msg, type = 'error') {
+        panelAlert.textContent = msg;
+        panelAlert.className = `alert alert-${type} show`;
+    }
+
+    function hidePanelAlert() {
+        panelAlert.className = 'alert';
+    }
+
+    /* ── Escape helper ─── */
+    function esc(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    /* ── Render room cards ─── */
+    let rooms = [];
+
+    function renderRooms() {
+        if (!rooms.length) {
+            roomsGrid.innerHTML = `<div style="grid-column:1/-1">
+                <div class="empty-state">
+                    <div class="empty-icon">🏠</div>
+                    <p>Номери відсутні. Додайте перший номер!</p>
+                </div>
+            </div>`;
+            return;
+        }
+
+        roomsGrid.innerHTML = rooms.map(r => `
+            <div class="room-card" data-id="${r.id}">
+                <div class="room-card-header">
+                    <h3>${esc(r.name)}</h3>
+                    <span class="badge badge-${r.is_active ? 'active' : 'inactive'}">
+                        ${r.is_active ? 'Активний' : 'Вимкнений'}
+                    </span>
+                </div>
+                <div class="room-card-body">
+                    <div class="room-meta">
+                        <div class="room-meta-item">
+                            <div class="label">Тип</div>
+                            <div class="value">${esc(r.type)}</div>
+                        </div>
+                        <div class="room-meta-item">
+                            <div class="label">Ціна</div>
+                            <div class="value">${r.price.toLocaleString('uk-UA')} ₴/ніч</div>
+                        </div>
+                        <div class="room-meta-item">
+                            <div class="label">Місткість</div>
+                            <div class="value">${r.capacity} осіб</div>
+                        </div>
+                        <div class="room-meta-item">
+                            <div class="label">Площа</div>
+                            <div class="value">${r.area ? r.area + ' м²' : '—'}</div>
+                        </div>
+                    </div>
+                    ${r.description ? `<p class="room-description">${esc(r.description)}</p>` : ''}
+                    ${r.amenities?.length ? `<p style="font-size:0.78rem;color:#8a9a8a;margin-bottom:10px">${r.amenities.map(a => esc(a)).join(', ')}</p>` : ''}
+                    <div class="room-actions">
+                        <button class="btn btn-secondary btn-sm" data-action="edit" data-id="${r.id}">✏️ Редагувати</button>
+                        <button class="btn ${r.is_active ? 'btn-warning' : 'btn-success'} btn-sm"
+                                data-action="toggle" data-id="${r.id}">
+                            ${r.is_active ? '⏸ Вимкнути' : '▶ Увімкнути'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /* ── Load rooms ─── */
+    async function loadRooms() {
+        roomsGrid.innerHTML = '<div style="text-align:center;padding:48px;color:#8a9a8a;grid-column:1/-1"><span class="spinner"></span> Завантаження…</div>';
+        try {
+            rooms = await getRooms();
+            renderRooms();
+        } catch (err) {
+            showAlert(err.message);
+            roomsGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>Помилка: ${esc(err.message)}</p></div>`;
+        }
+    }
+
+    /* ── Open panel for create ─── */
+    function openCreatePanel() {
+        panelTitle.textContent = 'Додати номер';
+        document.getElementById('roomId').value = '';
+        roomForm.reset();
+        document.getElementById('roomActive').checked = true;
+        hidePanelAlert();
+        panel.classList.add('open');
+    }
+
+    /* ── Open panel for edit ─── */
+    function openEditPanel(room) {
+        panelTitle.textContent = 'Редагувати номер';
+        document.getElementById('roomId').value = room.id;
+        document.getElementById('roomName').value     = room.name || '';
+        document.getElementById('roomType').value     = room.type || '';
+        document.getElementById('roomPrice').value    = room.price || '';
+        document.getElementById('roomCapacity').value = room.capacity || 2;
+        document.getElementById('roomArea').value     = room.area || '';
+        document.getElementById('roomDesc').value     = room.description || '';
+        document.getElementById('roomAmenities').value = (room.amenities || []).join(', ');
+        document.getElementById('roomPhotos').value    = (room.photos || []).join(', ');
+        document.getElementById('roomActive').checked  = room.is_active;
+        hidePanelAlert();
+        panel.classList.add('open');
+    }
+
+    /* ── Close panel ─── */
+    function closePanel() {
+        panel.classList.remove('open');
+    }
+
+    document.getElementById('closePanelBtn').addEventListener('click', closePanel);
+    document.getElementById('cancelPanelBtn').addEventListener('click', closePanel);
+
+    /* ── Save room ─── */
+    document.getElementById('saveRoomBtn').addEventListener('click', async () => {
+        hidePanelAlert();
+
+        const id       = document.getElementById('roomId').value;
+        const name     = document.getElementById('roomName').value.trim();
+        const type     = document.getElementById('roomType').value;
+        const price    = parseFloat(document.getElementById('roomPrice').value);
+        const capacity = parseInt(document.getElementById('roomCapacity').value) || 2;
+        const area     = parseFloat(document.getElementById('roomArea').value) || null;
+        const desc     = document.getElementById('roomDesc').value.trim() || null;
+        const amenArr  = document.getElementById('roomAmenities').value
+            .split(',').map(s => s.trim()).filter(Boolean);
+        const photosArr = document.getElementById('roomPhotos').value
+            .split(',').map(s => s.trim()).filter(Boolean);
+        const isActive = document.getElementById('roomActive').checked;
+
+        if (!name)  { showPanelAlert('Введіть назву номера'); return; }
+        if (!type)  { showPanelAlert('Оберіть тип номера'); return; }
+        if (!price || price <= 0) { showPanelAlert('Введіть коректну ціну'); return; }
+
+        const payload = {
+            name, type, price, capacity, area,
+            description: desc,
+            amenities: amenArr,
+            photos: photosArr,
+            is_active: isActive,
+        };
+
+        const saveBtn = document.getElementById('saveRoomBtn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Збереження…';
+
+        try {
+            if (id) {
+                await updateRoom(Number(id), payload);
+                toast('Номер оновлено');
+            } else {
+                await createRoom(payload);
+                toast('Номер додано');
+            }
+            closePanel();
+            await loadRooms();
+        } catch (err) {
+            showPanelAlert(err.message);
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Зберегти';
+        }
+    });
+
+    /* ── Room card actions (edit / toggle) ─── */
+    roomsGrid.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+
+        const id     = Number(btn.dataset.id);
+        const action = btn.dataset.action;
+        const room   = rooms.find(r => r.id === id);
+        if (!room) return;
+
+        if (action === 'edit') {
+            openEditPanel(room);
+        } else if (action === 'toggle') {
+            btn.disabled = true;
+            try {
+                await updateRoom(id, { is_active: !room.is_active });
+                toast(room.is_active ? 'Номер вимкнено' : 'Номер увімкнено');
+                await loadRooms();
+            } catch (err) {
+                toast(err.message, 'error');
+                btn.disabled = false;
+            }
+        }
+    });
+
+    /* ── Add room button ─── */
+    document.getElementById('addRoomBtn').addEventListener('click', openCreatePanel);
+
+    /* ── Logout ─── */
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    /* ── Burger ─── */
+    document.getElementById('burgerBtn').addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        mobileOverlay.classList.toggle('open');
+    });
+    mobileOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        mobileOverlay.classList.remove('open');
+    });
+
+    /* ── Init ─── */
+    loadRooms();
+</script>
+</body>
+</html>

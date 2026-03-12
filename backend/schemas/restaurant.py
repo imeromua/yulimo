@@ -1,9 +1,42 @@
 """Pydantic-схеми для ресторану."""
 
+import enum
 from datetime import date, time
 from typing import Optional
 
 from pydantic import BaseModel, Field
+
+
+class MenuCategory(str, enum.Enum):
+    starters = "starters"
+    soups    = "soups"
+    mains    = "mains"
+    grill    = "grill"
+    desserts = "desserts"
+    drinks   = "drinks"
+
+
+class MenuItemCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    category: MenuCategory
+    price: float = Field(..., gt=0)
+    description: Optional[str] = None
+    weight: Optional[str] = Field(None, max_length=20)
+    photo: Optional[str] = Field(None, max_length=255)
+    is_active: bool = True
+
+
+class MenuItemResponse(BaseModel):
+    id: int
+    name: str
+    category: str
+    price: float
+    description: Optional[str] = None
+    weight: Optional[str] = None
+    photo: Optional[str] = None
+    is_active: bool
+
+    model_config = {"from_attributes": True}
 
 
 class TableReservationCreate(BaseModel):

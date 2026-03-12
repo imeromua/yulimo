@@ -21,6 +21,18 @@ class RoomCreate(RoomBase):
     pass
 
 
+class RoomUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    type: Optional[str] = Field(None, max_length=50)
+    description: Optional[str] = None
+    capacity: Optional[int] = Field(None, ge=1, le=50)
+    area: Optional[float] = Field(None, gt=0)
+    price: Optional[float] = Field(None, gt=0)
+    amenities: Optional[List[str]] = None
+    photos: Optional[List[str]] = None
+    is_active: Optional[bool] = None
+
+
 class RoomResponse(RoomBase):
     id: int
 

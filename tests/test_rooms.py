@@ -60,6 +60,46 @@ def test_create_and_get_room(client):
     assert detail_resp.json()["price"] == 2500.0
 
 
+def test_update_room(client):
+    """Адмін може оновити існуючий номер."""
+    token = _admin_token(client)
+
+    create_resp = client.post(
+        "/api/rooms/",
+        json={"name": "Стандарт", "type": "standard", "price": 1000.0},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert create_resp.status_code == 201
+    room_id = create_resp.json()["id"]
+
+    patch_resp = client.patch(
+        f"/api/rooms/{room_id}",
+        json={"price": 1500.0, "is_active": False},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert patch_resp.status_code == 200
+    data = patch_resp.json()
+    assert data["price"] == 1500.0
+    assert data["is_active"] is False
+
+
+def test_update_room_not_found(client):
+    """Оновлення неіснуючого номеру повертає 404."""
+    token = _admin_token(client)
+    resp = client.patch(
+        "/api/rooms/99999",
+        json={"price": 999.0},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 404
+
+
+def test_update_room_requires_auth(client):
+    """Оновлення номеру без токена повертає 401."""
+    resp = client.patch("/api/rooms/1", json={"price": 999.0})
+    assert resp.status_code == 401
+
+
 def test_get_room_not_found(client):
     """Запит неіснуючого номеру повертає 404."""
     resp = client.get("/api/rooms/99999")
