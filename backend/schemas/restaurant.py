@@ -42,6 +42,7 @@ class MenuItemResponse(BaseModel):
 class TableReservationCreate(BaseModel):
     guest_name: str = Field(..., min_length=2, max_length=100)
     guest_phone: str = Field(..., min_length=7, max_length=20)
+    guest_email: Optional[str] = Field(None, max_length=100)
     date: date
     time: time
     guests_count: int = Field(..., ge=1, le=50)
@@ -52,6 +53,7 @@ class TableReservationResponse(BaseModel):
     id: int
     guest_name: str
     guest_phone: str
+    guest_email: Optional[str] = None
     date: date
     time: time
     guests_count: int
