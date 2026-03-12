@@ -9,27 +9,46 @@ const navLinks = document.getElementById('navLinks');
 const body     = document.body;
 
 // ---------- Навігація — scroll-ефект ----------
-if (navbar) {
-    window.addEventListener('scroll', () => {
+function updateNavbar() {
+    if (!navbar) return;
+    // На мобільних (<= 768px) navbar завжди темний
+    if (window.innerWidth <= 768) {
+        navbar.classList.add('scrolled');
+    } else {
         navbar.classList.toggle('scrolled', window.scrollY > 60);
-    }, { passive: true });
+    }
+}
+
+if (navbar) {
+    updateNavbar(); // встановлюємо одразу при завантаженні
+    window.addEventListener('scroll', updateNavbar, { passive: true });
+    window.addEventListener('resize', updateNavbar, { passive: true });
 }
 
 // ---------- Мобільне меню ----------
 if (burger && navLinks) {
     burger.addEventListener('click', () => {
-        navLinks.classList.toggle('open');
-        const expanded = navLinks.classList.contains('open');
-        burger.setAttribute('aria-expanded', String(expanded));
-        body.classList.toggle('menu-open', expanded);
+        const open = navLinks.classList.toggle('open');
+        burger.classList.toggle('active', open);
+        burger.setAttribute('aria-expanded', String(open));
+        body.classList.toggle('menu-open', open);
     });
 
     navLinks.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
             navLinks.classList.remove('open');
+            burger.classList.remove('active');
             burger.setAttribute('aria-expanded', 'false');
             body.classList.remove('menu-open');
         });
+    });
+
+    // Закрити меню при кліку на кнопку «Забронювати» у nav
+    document.querySelector('.nav-btn')?.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        burger.classList.remove('active');
+        burger.setAttribute('aria-expanded', 'false');
+        body.classList.remove('menu-open');
     });
 }
 
@@ -54,35 +73,18 @@ document.querySelectorAll('.social-disabled').forEach(button => {
 
 // ---------- Утиліти статусу ----------
 
-/**
- * Показати повідомлення статусу форми.
- * @param {HTMLElement|null} el
- * @param {string} message
- * @param {'success'|'error'} type
- */
 export function showStatus(el, message, type = 'success') {
     if (!el) return;
     el.textContent = message;
     el.className = `form-status show ${type}`;
 }
 
-/**
- * Очистити повідомлення статусу.
- * @param {HTMLElement|null} el
- */
 export function clearStatus(el) {
     if (!el) return;
     el.textContent = '';
     el.className = 'form-status';
 }
 
-/**
- * Встановити стан кнопки завантаження.
- * @param {HTMLButtonElement|null} btn
- * @param {boolean} loading
- * @param {string} loadingText
- * @param {string} defaultText
- */
 export function setButtonLoading(btn, loading, loadingText = 'Завантаження...', defaultText = 'Надіслати') {
     if (!btn) return;
     btn.disabled = loading;
