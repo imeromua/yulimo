@@ -70,12 +70,18 @@ body.menu-open { overflow: hidden; }
     cursor: pointer;
     margin-left: auto;
     padding: 4px;
-    /* поверх відкритого меню */
     position: relative;
     z-index: 101;
 }
-.burger span { width: 24px; height: 2px; background: var(--white); border-radius: 2px; transition: 0.3s; }
-/* Анімація бургера → хрестик */
+.burger span {
+    width: 24px;
+    height: 2px;
+    background: var(--white);
+    border-radius: 2px;
+    transition: 0.3s;
+    display: block;
+}
+/* Анімація бургер → хрестик */
 .burger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .burger.active span:nth-child(2) { opacity: 0; }
 .burger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -843,43 +849,52 @@ body.menu-open { overflow: hidden; }
 }
 
 @media (max-width: 768px) {
-    /* Navbar always has a visible dark background on mobile regardless of scroll position */
+    /* Navbar завжди темний на мобільних */
     .navbar {
-        background: rgba(14,35,24,0.94);
+        background: rgba(14,35,24,0.96);
         backdrop-filter: blur(14px);
-    }
-    /* Burger spans always white so they are visible over the dark background */
-    .burger span {
-        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+        padding: 12px 0;
     }
 
     .nav-links,
     .nav-btn { display: none; }
     .burger { display: flex; }
 
-    /* Відкрите мобільне меню */
+    /* Відкрите мобільне меню — повноекранний overlay */
     .nav-links.open {
         display: flex;
         flex-direction: column;
         position: fixed;
         inset: 0;
-        background: rgba(10,23,15,0.98);
+        background: rgba(10,23,15,0.99);
         align-items: center;
         justify-content: center;
         gap: 28px;
         font-size: 1.2rem;
-        z-index: 99;
+        /* Вище за будь-який контент сторінки */
+        z-index: 200;
         padding-bottom: 80px;
     }
-    /* Кнопка «Забронювати» видима у відкритому меню */
-    .nav-links.open + .nav-btn,
+    .nav-links.open li a {
+        color: rgba(255,255,255,0.9);
+        font-size: 1.3rem;
+        font-weight: 500;
+    }
+
+    /* Бургер поверх відкритого меню */
+    .burger {
+        z-index: 201;
+    }
+
+    /* Кнопка «Забронювати» внизу екрану при відкритому меню */
     .nav-links.open ~ .nav-btn {
         display: inline-flex;
         position: fixed;
         bottom: 24px;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 100;
+        z-index: 202;
         width: calc(100% - 48px);
         max-width: 400px;
         justify-content: center;
