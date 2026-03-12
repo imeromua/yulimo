@@ -843,6 +843,16 @@ body.menu-open { overflow: hidden; }
 }
 
 @media (max-width: 768px) {
+    /* Navbar always has a visible dark background on mobile regardless of scroll position */
+    .navbar {
+        background: rgba(14,35,24,0.94);
+        backdrop-filter: blur(14px);
+    }
+    /* Burger spans always white so they are visible over the dark background */
+    .burger span {
+        background: #ffffff;
+    }
+
     .nav-links,
     .nav-btn { display: none; }
     .burger { display: flex; }
