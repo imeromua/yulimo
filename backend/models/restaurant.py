@@ -33,6 +33,7 @@ class TableReservation(Base):
     id           = Column(Integer, primary_key=True, index=True)
     guest_name   = Column(String(100), nullable=False)
     guest_phone  = Column(String(20), nullable=False)
+    guest_email  = Column(String(100), nullable=True)
     date         = Column(Date, nullable=False)
     time         = Column(Time, nullable=False)
     guests_count = Column(Integer, nullable=False)

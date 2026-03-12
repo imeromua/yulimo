@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str = "admin@yulimo.kyiv.ua"
     ADMIN_PASSWORD: str = "change-this-password"
 
+    # Email (Resend)
+    RESEND_API_KEY: str = ""
+    FROM_EMAIL: str = "noreply@yulimo.kyiv.ua"
+    NOTIFICATION_ADMIN_EMAIL: str = "yuzko@ukr.net"
+
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,https://yulimo.kyiv.ua"
 

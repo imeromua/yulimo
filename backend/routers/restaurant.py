@@ -14,6 +14,7 @@ from services.restaurant_service import (
     create_table_reservation,
     get_menu,
 )
+from services import email_service
 
 router = APIRouter()
 
@@ -43,8 +44,12 @@ def add_menu_item_endpoint(
     response_model=TableReservationResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def reserve_table(data: TableReservationCreate, db: Session = Depends(get_db)):
+async def reserve_table(data: TableReservationCreate, db: Session = Depends(get_db)):
     """Резервація столика в ресторані."""
     reservation = create_table_reservation(data, db)
+
+    await email_service.send_table_reservation_confirmation(reservation)
+    await email_service.send_table_reservation_notification_admin(reservation)
+
     return reservation
 
