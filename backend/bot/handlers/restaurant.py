@@ -12,7 +12,8 @@ from bot.states import TableStates
 from core.config import settings
 from database import SessionLocal
 from schemas.restaurant import TableReservationCreate
-from services import email_service, restaurant_service
+from services import restaurant_service
+from services.email_service import _is_enabled, _send, _wrap_html
 
 logger = logging.getLogger("yulimo.bot")
 
@@ -156,8 +157,8 @@ async def table_phone(message: Message, state: FSMContext) -> None:
 
 @router.callback_query(lambda c: c.data == "table:cancel")
 async def table_cancel(callback: CallbackQuery, state: FSMContext) -> None:
-    from bot.keyboards import main_menu_keyboard
     from bot.handlers.start import WELCOME_TEXT
+    from bot.keyboards import main_menu_keyboard
 
     await state.clear()
     await callback.message.edit_text(WELCOME_TEXT, reply_markup=main_menu_keyboard())
@@ -192,16 +193,31 @@ async def table_confirm(callback: CallbackQuery, state: FSMContext) -> None:
     finally:
         db.close()
 
-    # Email notification to admin
-    try:
-        await email_service.send_table_reservation_notification_admin(reservation)
-    except Exception as exc:
-        logger.error("Помилка відправки email адміну: %s", exc)
+    # Email адміну
+    if _is_enabled():
+        subject = f"🍽️ Нова резервація столика від {reservation.guest_name}"
+        body = (
+            '<h2 style="color:#2d5a27;margin-top:0;">Нова резервація через бота</h2>'
+            '<table style="width:100%;border-collapse:collapse;">'
+            f'<tr><td style="padding:6px 0;color:#555;">Ім\'\u044f:</td><td><strong>{reservation.guest_name}</strong></td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Телефон:</td><td>{reservation.guest_phone}</td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Дата:</td><td>{reservation.date.strftime(DATE_FORMAT)}</td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Час:</td><td>{reservation.time.strftime(TIME_FORMAT)}</td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Гостей:</td><td>{reservation.guests_count}</td></tr>'
+            '</table>'
+        )
+        try:
+            await _send(
+                settings.NOTIFICATION_ADMIN_EMAIL,
+                subject,
+                _wrap_html(subject, body),
+            )
+        except Exception as exc:
+            logger.error("Помилка email адміну: %s", exc)
 
-    # Telegram notification to admin
+    # Telegram сповіщення адміну
     if settings.TELEGRAM_ADMIN_CHAT_ID:
         from bot.main import bot as _bot
-
         if _bot is not None:
             try:
                 admin_text = (
@@ -217,7 +233,7 @@ async def table_confirm(callback: CallbackQuery, state: FSMContext) -> None:
                     parse_mode="HTML",
                 )
             except Exception as exc:
-                logger.error("Помилка відправки Telegram сповіщення адміну: %s", exc)
+                logger.error("Помилка Telegram сповіщення: %s", exc)
 
     await callback.message.edit_text(
         f"✅ <b>Резервацію №{reservation.id} прийнято!</b>\n"
