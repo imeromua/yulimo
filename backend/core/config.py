@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     # Telegram Bot
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_ADMIN_CHAT_ID: str = ""
+    TELEGRAM_WEBHOOK_BASE_URL: str = "https://yulimo.kyiv.ua"
 
     model_config = SettingsConfigDict(
         env_file=".env",
