@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клієнти — Адмін-панель Юлімо</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/admin/bookings.html" class="sidebar-logo">ЮЛІМО</a>
+            <div class="sidebar-label">Адмін-панель</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin/bookings.html"><span class="nav-icon">📋</span> Бронювання</a>
+            <a href="/admin/rooms.html"><span class="nav-icon">🏠</span> Номери</a>
+            <a href="/admin/restaurant.html"><span class="nav-icon">🍽️</span> Ресторан</a>
+            <a href="/admin/clients.html" class="active"><span class="nav-icon">👥</span> Клієнти</a>
+            <a href="/admin/media.html"><span class="nav-icon">🖼️</span> Медіа</a>
+            <a href="/admin/emails.html"><span class="nav-icon">📧</span> Емейли</a>
+            <a href="/admin/content.html"><span class="nav-icon">📝</span> Контент</a>
+            <a href="/admin/settings.html"><span class="nav-icon">⚙️</span> Налаштування</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebarUser">—</div>
+            <button class="btn btn-secondary btn-block" id="logoutBtn">Вийти</button>
+        </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Main content -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <button class="burger-btn" id="burgerBtn" aria-label="Меню">
+                <span></span><span></span><span></span>
+            </button>
+            <span class="topbar-title">Клієнти</span>
+            <div class="topbar-actions">
+                <button class="btn btn-primary btn-sm" id="addClientBtn">+ Додати клієнта</button>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- Search -->
+            <div class="filters">
+                <input type="text" class="filter-select" id="searchInput" placeholder="Пошук за ім'ям, телефоном, email…" style="width:300px;">
+                <button class="btn btn-secondary btn-sm" id="searchBtn">🔍 Шукати</button>
+            </div>
+
+            <div id="alertBox" class="alert"></div>
+
+            <!-- Table -->
+            <div class="table-wrap">
+                <table id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ім'я</th>
+                            <th>Телефон</th>
+                            <th>Email</th>
+                            <th>Бронювань</th>
+                            <th>Останній візит</th>
+                            <th>Джерело</th>
+                            <th>Статус</th>
+                            <th>Дія</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTbody">
+                        <tr class="loading-row"><td colspan="9"><span class="spinner"></span> Завантаження…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="filters" id="pagination" style="margin-top:12px;gap:8px;"></div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div id="clientModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;overflow:auto;">
+    <div style="background:#fff;max-width:500px;margin:60px auto;border-radius:12px;padding:32px;">
+        <h2 id="modalTitle" style="margin:0 0 20px;color:#2d5a27;">Клієнт</h2>
+        <div id="modalAlert" class="alert"></div>
+        <div style="display:grid;gap:14px;">
+            <div>
+                <label style="font-size:.85rem;color:#666;display:block;margin-bottom:4px;">Ім'я *</label>
+                <input type="text" id="fName" class="filter-select" style="width:100%;box-sizing:border-box;" placeholder="Ім'я клієнта">
+            </div>
+            <div>
+                <label style="font-size:.85rem;color:#666;display:block;margin-bottom:4px;">Телефон *</label>
+                <input type="text" id="fPhone" class="filter-select" style="width:100%;box-sizing:border-box;" placeholder="+380…">
+            </div>
+            <div>
+                <label style="font-size:.85rem;color:#666;display:block;margin-bottom:4px;">Email</label>
+                <input type="email" id="fEmail" class="filter-select" style="width:100%;box-sizing:border-box;" placeholder="email@example.com">
+            </div>
+            <div>
+                <label style="font-size:.85rem;color:#666;display:block;margin-bottom:4px;">День народження</label>
+                <input type="date" id="fBirthday" class="filter-select" style="width:100%;box-sizing:border-box;">
+            </div>
+            <div>
+                <label style="font-size:.85rem;color:#666;display:block;margin-bottom:4px;">Джерело</label>
+                <select id="fSource" class="filter-select" style="width:100%;box-sizing:border-box;">
+                    <option value="">— не вказано —</option>
+                    <option value="website">Сайт</option>
+                    <option value="phone">Телефон</option>
+                    <option value="referral">Рекомендація</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:.85rem;color:#666;display:block;margin-bottom:4px;">Нотатки</label>
+                <textarea id="fNotes" class="filter-select" rows="3" style="width:100%;box-sizing:border-box;resize:vertical;font-family:inherit;" placeholder="Адмін-нотатки…"></textarea>
+            </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px;">
+            <button class="btn btn-primary" id="saveClientBtn" style="flex:1;">Зберегти</button>
+            <button class="btn btn-secondary" id="cancelModalBtn" style="flex:1;">Скасувати</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+    import { requireAuth, logout, getToken } from './js/auth.js';
+    if (!requireAuth()) { /* redirected */ }
+
+    const API = '/api';
+    const token = () => getToken();
+    const headers = () => ({ 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' });
+
+    const tbody = document.getElementById('clientsTbody');
+    const alertBox = document.getElementById('alertBox');
+    const modalEl = document.getElementById('clientModal');
+    const modalAlert = document.getElementById('modalAlert');
+    let editId = null;
+    let currentPage = 1;
+    let currentSearch = '';
+
+    function toast(msg, type = 'success') {
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    function showAlert(msg, type = 'error') {
+        alertBox.textContent = msg;
+        alertBox.className = `alert alert-${type} show`;
+        setTimeout(() => alertBox.className = 'alert', 4000);
+    }
+
+    function showModalAlert(msg, type = 'error') {
+        modalAlert.textContent = msg;
+        modalAlert.className = `alert alert-${type} show`;
+    }
+
+    const SOURCE_LABELS = { website: 'Сайт', phone: 'Телефон', referral: 'Рекомендація' };
+
+    async function loadClients(page = 1, search = '') {
+        currentPage = page;
+        currentSearch = search;
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="9"><span class="spinner"></span> Завантаження…</td></tr>';
+        const params = new URLSearchParams({ page, per_page: 20 });
+        if (search) params.append('search', search);
+        const res = await fetch(`${API}/admin/clients?${params}`, { headers: headers() });
+        const json = await res.json();
+        if (!json.success) { showAlert(json.error || 'Помилка'); return; }
+        const { items, total, per_page } = json.data;
+        renderTable(items);
+        renderPagination(total, page, per_page);
+        document.getElementById('sidebarUser').textContent = '';
+    }
+
+    function renderTable(clients) {
+        if (!clients.length) {
+            tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">👥</div><p>Клієнтів не знайдено</p></div></td></tr>';
+            return;
+        }
+        tbody.innerHTML = clients.map(c => `
+            <tr>
+                <td>${c.id}</td>
+                <td><strong>${esc(c.name)}</strong></td>
+                <td>${esc(c.phone)}</td>
+                <td>${c.email ? esc(c.email) : '—'}</td>
+                <td>${c.bookings_count}</td>
+                <td>${c.last_visit || '—'}</td>
+                <td>${c.source ? (SOURCE_LABELS[c.source] || c.source) : '—'}</td>
+                <td><span class="badge ${c.is_active ? 'badge-confirmed' : 'badge-cancelled'}">${c.is_active ? 'Активний' : 'Деактивовано'}</span></td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="editClient(${c.id})">✏️ Редагувати</button>
+                    ${c.is_active ? `<button class="btn btn-danger btn-sm" onclick="deactivateClient(${c.id})">🗑 Деактивувати</button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderPagination(total, page, per_page) {
+        const pages = Math.ceil(total / per_page);
+        const pg = document.getElementById('pagination');
+        if (pages <= 1) { pg.innerHTML = ''; return; }
+        let html = `<span style="color:#666;font-size:.85rem;">Сторінка ${page} з ${pages} (${total} клієнтів)</span>`;
+        if (page > 1) html += `<button class="btn btn-secondary btn-sm" onclick="loadClients(${page-1},'${currentSearch}')">← Попередня</button>`;
+        if (page < pages) html += `<button class="btn btn-secondary btn-sm" onclick="loadClients(${page+1},'${currentSearch}')">Наступна →</button>`;
+        pg.innerHTML = html;
+    }
+
+    function esc(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    window.editClient = async function(id) {
+        const res = await fetch(`${API}/admin/clients/${id}`, { headers: headers() });
+        const json = await res.json();
+        if (!json.success) { toast('Помилка завантаження', 'error'); return; }
+        const c = json.data.client;
+        editId = id;
+        document.getElementById('modalTitle').textContent = 'Редагувати клієнта';
+        document.getElementById('fName').value = c.name || '';
+        document.getElementById('fPhone').value = c.phone || '';
+        document.getElementById('fEmail').value = c.email || '';
+        document.getElementById('fBirthday').value = c.birthday || '';
+        document.getElementById('fSource').value = c.source || '';
+        document.getElementById('fNotes').value = c.notes || '';
+        modalAlert.className = 'alert';
+        modalEl.style.display = 'block';
+    };
+
+    window.deactivateClient = async function(id) {
+        if (!confirm('Деактивувати клієнта?')) return;
+        const res = await fetch(`${API}/admin/clients/${id}`, { method: 'DELETE', headers: headers() });
+        const json = await res.json();
+        if (json.success) { toast('Клієнта деактивовано'); loadClients(currentPage, currentSearch); }
+        else toast(json.detail || 'Помилка', 'error');
+    };
+
+    document.getElementById('addClientBtn').onclick = () => {
+        editId = null;
+        document.getElementById('modalTitle').textContent = 'Новий клієнт';
+        ['fName','fPhone','fEmail','fBirthday','fNotes'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('fSource').value = '';
+        modalAlert.className = 'alert';
+        modalEl.style.display = 'block';
+    };
+
+    document.getElementById('cancelModalBtn').onclick = () => { modalEl.style.display = 'none'; };
+    modalEl.addEventListener('click', e => { if (e.target === modalEl) modalEl.style.display = 'none'; });
+
+    document.getElementById('saveClientBtn').onclick = async () => {
+        const name = document.getElementById('fName').value.trim();
+        const phone = document.getElementById('fPhone').value.trim();
+        if (!name || !phone) { showModalAlert('Вкажіть ім\'я та телефон'); return; }
+        const body = {
+            name, phone,
+            email: document.getElementById('fEmail').value.trim() || null,
+            birthday: document.getElementById('fBirthday').value || null,
+            source: document.getElementById('fSource').value || null,
+            notes: document.getElementById('fNotes').value.trim() || null,
+        };
+        const url = editId ? `${API}/admin/clients/${editId}` : `${API}/admin/clients`;
+        const method = editId ? 'PUT' : 'POST';
+        const res = await fetch(url, { method, headers: headers(), body: JSON.stringify(body) });
+        const json = await res.json();
+        if (json.success) {
+            modalEl.style.display = 'none';
+            toast(editId ? 'Клієнта оновлено' : 'Клієнта створено');
+            loadClients(currentPage, currentSearch);
+        } else {
+            showModalAlert(json.detail || json.error || 'Помилка');
+        }
+    };
+
+    document.getElementById('searchBtn').onclick = () => loadClients(1, document.getElementById('searchInput').value.trim());
+    document.getElementById('searchInput').onkeydown = e => { if (e.key === 'Enter') loadClients(1, e.target.value.trim()); };
+
+    // Sidebar
+    document.getElementById('logoutBtn').onclick = () => { logout(); window.location.href = '/admin/login.html'; };
+    const burger = document.getElementById('burgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobileOverlay');
+    burger.onclick = () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); };
+    overlay.onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+
+    loadClients();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контент — Адмін-панель Юлімо</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .section-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+        .section-tab { padding:7px 16px; border-radius:20px; background:#e8e0d0; border:none; cursor:pointer; font-size:.85rem; }
+        .section-tab.active { background:#2d5a27; color:#fff; }
+        .block-card { background:#fff; border:1px solid #e8e0d0; border-radius:10px; padding:16px; margin-bottom:12px; }
+        .block-label { font-size:.85rem; color:#666; margin-bottom:6px; }
+        .block-key { font-size:.75rem; color:#999; font-family:monospace; }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/admin/bookings.html" class="sidebar-logo">ЮЛІМО</a>
+            <div class="sidebar-label">Адмін-панель</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin/bookings.html"><span class="nav-icon">📋</span> Бронювання</a>
+            <a href="/admin/rooms.html"><span class="nav-icon">🏠</span> Номери</a>
+            <a href="/admin/restaurant.html"><span class="nav-icon">🍽️</span> Ресторан</a>
+            <a href="/admin/clients.html"><span class="nav-icon">👥</span> Клієнти</a>
+            <a href="/admin/media.html"><span class="nav-icon">🖼️</span> Медіа</a>
+            <a href="/admin/emails.html"><span class="nav-icon">📧</span> Емейли</a>
+            <a href="/admin/content.html" class="active"><span class="nav-icon">📝</span> Контент</a>
+            <a href="/admin/settings.html"><span class="nav-icon">⚙️</span> Налаштування</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebarUser">—</div>
+            <button class="btn btn-secondary btn-block" id="logoutBtn">Вийти</button>
+        </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <div class="main-content">
+        <header class="topbar">
+            <button class="burger-btn" id="burgerBtn"><span></span><span></span><span></span></button>
+            <span class="topbar-title">Контент-блоки</span>
+        </header>
+
+        <main class="page-content">
+
+            <div class="section-tabs" id="sectionTabs"></div>
+
+            <div id="alertBox" class="alert"></div>
+            <div id="blocksContainer"></div>
+
+        </main>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+    import { requireAuth, logout, getToken } from './js/auth.js';
+    if (!requireAuth()) { /* redirected */ }
+
+    const API = '/api';
+    const token = () => getToken();
+    const h = () => ({ 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' });
+
+    const SECTION_LABELS = {
+        hero: '🏔 Герой',
+        about: '📖 Про нас',
+        rooms: '🏠 Номери',
+        restaurant: '🍽️ Ресторан',
+        services: '⚙️ Сервіс',
+        footer: '📌 Футер',
+        other: '📁 Інше',
+    };
+
+    let allBlocks = {};
+    let currentSection = null;
+
+    function toast(msg, type='success') {
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    async function loadContent() {
+        const res = await fetch(`${API}/admin/content`, { headers: h() });
+        const json = await res.json();
+        if (!json.success) { document.getElementById('alertBox').textContent = 'Помилка завантаження'; return; }
+        allBlocks = json.data;
+        renderTabs();
+        const sections = Object.keys(allBlocks);
+        if (sections.length) showSection(currentSection || sections[0]);
+    }
+
+    function renderTabs() {
+        const tabsEl = document.getElementById('sectionTabs');
+        const sections = Object.keys(allBlocks);
+        tabsEl.innerHTML = sections.map(s =>
+            `<button class="section-tab ${s === (currentSection || sections[0]) ? 'active' : ''}" data-section="${s}">${SECTION_LABELS[s] || s}</button>`
+        ).join('');
+        tabsEl.querySelectorAll('.section-tab').forEach(btn => {
+            btn.onclick = () => {
+                currentSection = btn.dataset.section;
+                tabsEl.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                showSection(currentSection);
+            };
+        });
+    }
+
+    function showSection(section) {
+        currentSection = section;
+        const blocks = allBlocks[section] || [];
+        const container = document.getElementById('blocksContainer');
+        container.innerHTML = blocks.map(b => {
+            const isLong = b.block_type === 'html' || (b.value && b.value.length > 100);
+            const inputHtml = isLong
+                ? `<textarea id="val-${b.key}" class="filter-select" rows="4" style="width:100%;box-sizing:border-box;resize:vertical;font-family:${b.block_type==='html'?'monospace':'inherit'};font-size:.9rem;">${esc(b.value)}</textarea>`
+                : `<input type="text" id="val-${b.key}" class="filter-select" value="${esc(b.value)}" style="width:100%;box-sizing:border-box;">`;
+            return `
+                <div class="block-card">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">
+                        <label class="block-label" for="val-${b.key}">${esc(b.label)}</label>
+                        <span class="block-key">${esc(b.key)}</span>
+                    </div>
+                    ${inputHtml}
+                    <div style="margin-top:8px;">
+                        <button class="btn btn-primary btn-sm" onclick="saveBlock('${b.key}')">💾 Зберегти</button>
+                        <span id="saved-${b.key}" style="color:#2d5a27;font-size:.8rem;margin-left:8px;opacity:0;transition:opacity .5s;"></span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.saveBlock = async function(key) {
+        const el = document.getElementById(`val-${key}`);
+        const value = el.value;
+        const res = await fetch(`${API}/admin/content/${key}`, { method:'PUT', headers: h(), body: JSON.stringify({value}) });
+        const json = await res.json();
+        if (json.success) {
+            const indicator = document.getElementById(`saved-${key}`);
+            indicator.textContent = '✓ Збережено';
+            indicator.style.opacity = '1';
+            setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
+            // Update local data
+            if (allBlocks[currentSection]) {
+                const b = allBlocks[currentSection].find(b => b.key === key);
+                if (b) b.value = value;
+            }
+        } else toast(json.detail || 'Помилка', 'error');
+    };
+
+    function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    document.getElementById('logoutBtn').onclick = () => { logout(); window.location.href = '/admin/login.html'; };
+    const burger = document.getElementById('burgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobileOverlay');
+    burger.onclick = () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); };
+    overlay.onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+
+    loadContent();
+</script>
+
+</body>
+</html>

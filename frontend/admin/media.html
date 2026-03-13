@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Медіа — Адмін-панель Юлімо</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .media-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-top:20px; }
+        .media-card { background:#fff; border:1px solid #e8e0d0; border-radius:10px; overflow:hidden; }
+        .media-card img { width:100%; height:140px; object-fit:cover; display:block; }
+        .media-card-body { padding:10px; }
+        .media-card-name { font-size:.8rem; color:#555; word-break:break-all; margin-bottom:6px; }
+        .media-card-actions { display:flex; gap:6px; flex-wrap:wrap; }
+        .upload-zone { border:2px dashed #c5b99a; border-radius:10px; padding:40px; text-align:center; cursor:pointer; transition:background .2s; background:#fafaf7; }
+        .upload-zone:hover,.upload-zone.drag-over { background:#f0ebe0; border-color:#8b7355; }
+        .upload-zone-icon { font-size:2.5rem; margin-bottom:8px; }
+        .section-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+        .section-tab { padding:6px 14px; border-radius:20px; background:#e8e0d0; border:none; cursor:pointer; font-size:.85rem; }
+        .section-tab.active { background:#2d5a27; color:#fff; }
+        .badge-active { background:#d4edda; color:#155724; padding:2px 8px; border-radius:10px; font-size:.75rem; }
+        .badge-inactive { background:#f8d7da; color:#721c24; padding:2px 8px; border-radius:10px; font-size:.75rem; }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/admin/bookings.html" class="sidebar-logo">ЮЛІМО</a>
+            <div class="sidebar-label">Адмін-панель</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin/bookings.html"><span class="nav-icon">📋</span> Бронювання</a>
+            <a href="/admin/rooms.html"><span class="nav-icon">🏠</span> Номери</a>
+            <a href="/admin/restaurant.html"><span class="nav-icon">🍽️</span> Ресторан</a>
+            <a href="/admin/clients.html"><span class="nav-icon">👥</span> Клієнти</a>
+            <a href="/admin/media.html" class="active"><span class="nav-icon">🖼️</span> Медіа</a>
+            <a href="/admin/emails.html"><span class="nav-icon">📧</span> Емейли</a>
+            <a href="/admin/content.html"><span class="nav-icon">📝</span> Контент</a>
+            <a href="/admin/settings.html"><span class="nav-icon">⚙️</span> Налаштування</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebarUser">—</div>
+            <button class="btn btn-secondary btn-block" id="logoutBtn">Вийти</button>
+        </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <div class="main-content">
+        <header class="topbar">
+            <button class="burger-btn" id="burgerBtn"><span></span><span></span><span></span></button>
+            <span class="topbar-title">Медіа</span>
+            <div class="topbar-actions">
+                <button class="btn btn-secondary btn-sm" id="refreshBtn">↻ Оновити</button>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- Upload zone -->
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-zone-icon">📁</div>
+                <p style="margin:0;color:#666;">Перетягніть файли сюди або <strong style="color:#2d5a27;">оберіть файли</strong></p>
+                <p style="font-size:.8rem;color:#999;margin:6px 0 0;">JPG, PNG, WEBP · Макс. 10 МБ</p>
+                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" multiple style="display:none;">
+            </div>
+
+            <!-- Upload form -->
+            <div id="uploadForm" style="display:none;background:#fff;border:1px solid #e8e0d0;border-radius:10px;padding:20px;margin-top:16px;">
+                <h3 style="margin:0 0 14px;color:#2d5a27;">Параметри завантаження</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div>
+                        <label style="font-size:.85rem;color:#666;">Розділ</label>
+                        <select id="upSection" class="filter-select" style="width:100%;margin-top:4px;">
+                            <option value="gallery">Галерея</option>
+                            <option value="rooms">Номери</option>
+                            <option value="restaurant">Ресторан</option>
+                            <option value="hero">Головна (hero)</option>
+                            <option value="other">Інше</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:.85rem;color:#666;">Підпис (UA)</label>
+                        <input type="text" id="upTitle" class="filter-select" style="width:100%;margin-top:4px;box-sizing:border-box;" placeholder="Назва зображення">
+                    </div>
+                </div>
+                <div id="fileList" style="margin:12px 0;font-size:.85rem;color:#555;"></div>
+                <div style="display:flex;gap:10px;margin-top:12px;">
+                    <button class="btn btn-primary btn-sm" id="doUploadBtn">⬆ Завантажити</button>
+                    <button class="btn btn-secondary btn-sm" id="cancelUploadBtn">Скасувати</button>
+                </div>
+            </div>
+
+            <!-- Section filter -->
+            <div class="section-tabs" id="sectionTabs" style="margin-top:20px;">
+                <button class="section-tab active" data-section="">Всі</button>
+                <button class="section-tab" data-section="gallery">Галерея</button>
+                <button class="section-tab" data-section="rooms">Номери</button>
+                <button class="section-tab" data-section="restaurant">Ресторан</button>
+                <button class="section-tab" data-section="hero">Hero</button>
+                <button class="section-tab" data-section="other">Інше</button>
+            </div>
+
+            <div id="alertBox" class="alert"></div>
+
+            <div id="mediaGrid" class="media-grid">
+                <div class="loading-row" style="grid-column:1/-1;text-align:center;padding:40px;">
+                    <span class="spinner"></span> Завантаження…
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Edit modal -->
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;overflow:auto;">
+    <div style="background:#fff;max-width:420px;margin:80px auto;border-radius:12px;padding:28px;">
+        <h3 style="margin:0 0 16px;color:#2d5a27;">Редагувати медіа</h3>
+        <img id="editPreview" src="" alt="" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-bottom:14px;">
+        <div style="display:grid;gap:12px;">
+            <div>
+                <label style="font-size:.85rem;color:#666;">Підпис (UA)</label>
+                <input type="text" id="eTitleUk" class="filter-select" style="width:100%;margin-top:4px;box-sizing:border-box;">
+            </div>
+            <div>
+                <label style="font-size:.85rem;color:#666;">Розділ</label>
+                <select id="eSection" class="filter-select" style="width:100%;margin-top:4px;">
+                    <option value="gallery">Галерея</option>
+                    <option value="rooms">Номери</option>
+                    <option value="restaurant">Ресторан</option>
+                    <option value="hero">Hero</option>
+                    <option value="other">Інше</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:.85rem;color:#666;">Порядок сортування</label>
+                <input type="number" id="eSortOrder" class="filter-select" style="width:100%;margin-top:4px;box-sizing:border-box;" value="0">
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" id="eIsActive" style="width:16px;height:16px;">
+                <label for="eIsActive" style="font-size:.9rem;">Активне</label>
+            </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px;">
+            <button class="btn btn-primary" id="saveEditBtn" style="flex:1;">Зберегти</button>
+            <button class="btn btn-secondary" id="closeEditBtn" style="flex:1;">Скасувати</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+    import { requireAuth, logout, getToken } from './js/auth.js';
+    if (!requireAuth()) { /* redirected */ }
+
+    const API = '/api';
+    const token = () => getToken();
+    const headers = () => ({ 'Authorization': `Bearer ${token()}` });
+    const jsonHeaders = () => ({ 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' });
+
+    let currentSection = '';
+    let editId = null;
+
+    function toast(msg, type='success') {
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    async function loadMedia(section='') {
+        const grid = document.getElementById('mediaGrid');
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;"><span class="spinner"></span></div>';
+        const url = `${API}/admin/media` + (section ? `?section=${section}` : '');
+        const res = await fetch(url, { headers: headers() });
+        const json = await res.json();
+        if (!json.success) { grid.innerHTML = '<p style="color:red;">Помилка завантаження</p>'; return; }
+        renderGrid(json.data);
+    }
+
+    function renderGrid(items) {
+        const grid = document.getElementById('mediaGrid');
+        if (!items.length) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:#999;">📷 Немає зображень</div>';
+            return;
+        }
+        grid.innerHTML = items.map(m => `
+            <div class="media-card">
+                <img src="/images/${esc(m.filename)}" alt="${esc(m.title_uk || m.original_name)}" loading="lazy" onerror="this.style.background='#eee';this.style.height='140px';">
+                <div class="media-card-body">
+                    <div class="media-card-name">${esc(m.title_uk || m.original_name)}</div>
+                    <div style="margin-bottom:6px;">
+                        <span class="badge-${m.is_active ? 'active' : 'inactive'}">${m.is_active ? 'Активне' : 'Неактивне'}</span>
+                        <span style="font-size:.75rem;color:#999;margin-left:4px;">${esc(m.section)}</span>
+                    </div>
+                    <div class="media-card-actions">
+                        <button class="btn btn-primary btn-sm" onclick="openEdit(${m.id},'${esc(m.filename)}','${esc(m.title_uk||'')}','${esc(m.section)}',${m.sort_order},${m.is_active})">✏️</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMedia(${m.id})">🗑</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function esc(str) {
+        return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    // Section tabs
+    document.getElementById('sectionTabs').onclick = e => {
+        const tab = e.target.closest('.section-tab');
+        if (!tab) return;
+        document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentSection = tab.dataset.section;
+        loadMedia(currentSection);
+    };
+
+    // Upload
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const uploadForm = document.getElementById('uploadForm');
+    let selectedFiles = [];
+
+    uploadZone.onclick = () => fileInput.click();
+    uploadZone.ondragover = e => { e.preventDefault(); uploadZone.classList.add('drag-over'); };
+    uploadZone.ondragleave = () => uploadZone.classList.remove('drag-over');
+    uploadZone.ondrop = e => {
+        e.preventDefault();
+        uploadZone.classList.remove('drag-over');
+        handleFiles(e.dataTransfer.files);
+    };
+    fileInput.onchange = e => handleFiles(e.target.files);
+
+    function handleFiles(files) {
+        selectedFiles = Array.from(files);
+        if (!selectedFiles.length) return;
+        document.getElementById('fileList').textContent = selectedFiles.map(f => f.name).join(', ');
+        uploadForm.style.display = 'block';
+    }
+
+    document.getElementById('cancelUploadBtn').onclick = () => {
+        uploadForm.style.display = 'none';
+        selectedFiles = [];
+        fileInput.value = '';
+    };
+
+    document.getElementById('doUploadBtn').onclick = async () => {
+        if (!selectedFiles.length) return;
+        const section = document.getElementById('upSection').value;
+        const titleUk = document.getElementById('upTitle').value.trim();
+        let uploaded = 0;
+        for (const file of selectedFiles) {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('section', section);
+            if (titleUk) fd.append('title_uk', titleUk);
+            try {
+                const res = await fetch(`${API}/admin/media/upload`, { method: 'POST', headers: headers(), body: fd });
+                const json = await res.json();
+                if (json.success) uploaded++;
+                else toast(`${file.name}: ${json.detail || 'Помилка'}`, 'error');
+            } catch(e) { toast(`${file.name}: мережева помилка`, 'error'); }
+        }
+        if (uploaded) { toast(`Завантажено ${uploaded} файл(ів)`); loadMedia(currentSection); }
+        uploadForm.style.display = 'none';
+        selectedFiles = [];
+        fileInput.value = '';
+    };
+
+    window.openEdit = function(id, filename, titleUk, section, sortOrder, isActive) {
+        editId = id;
+        document.getElementById('editPreview').src = `/images/${filename}`;
+        document.getElementById('eTitleUk').value = titleUk;
+        document.getElementById('eSection').value = section;
+        document.getElementById('eSortOrder').value = sortOrder;
+        document.getElementById('eIsActive').checked = isActive;
+        document.getElementById('editModal').style.display = 'block';
+    };
+
+    document.getElementById('closeEditBtn').onclick = () => { document.getElementById('editModal').style.display = 'none'; };
+    document.getElementById('editModal').onclick = e => { if (e.target === document.getElementById('editModal')) document.getElementById('editModal').style.display = 'none'; };
+
+    document.getElementById('saveEditBtn').onclick = async () => {
+        const body = {
+            title_uk: document.getElementById('eTitleUk').value.trim() || null,
+            section: document.getElementById('eSection').value,
+            sort_order: parseInt(document.getElementById('eSortOrder').value) || 0,
+            is_active: document.getElementById('eIsActive').checked,
+        };
+        const res = await fetch(`${API}/admin/media/${editId}`, { method: 'PUT', headers: jsonHeaders(), body: JSON.stringify(body) });
+        const json = await res.json();
+        if (json.success) {
+            document.getElementById('editModal').style.display = 'none';
+            toast('Збережено');
+            loadMedia(currentSection);
+        } else toast(json.detail || 'Помилка', 'error');
+    };
+
+    window.deleteMedia = async function(id) {
+        if (!confirm('Видалити це зображення?')) return;
+        const res = await fetch(`${API}/admin/media/${id}`, { method: 'DELETE', headers: headers() });
+        const json = await res.json();
+        if (json.success) { toast('Видалено'); loadMedia(currentSection); }
+        else toast(json.detail || 'Помилка', 'error');
+    };
+
+    document.getElementById('refreshBtn').onclick = () => loadMedia(currentSection);
+    document.getElementById('logoutBtn').onclick = () => { logout(); window.location.href = '/admin/login.html'; };
+    const burger = document.getElementById('burgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobileOverlay');
+    burger.onclick = () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); };
+    overlay.onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+
+    loadMedia();
+</script>
+
+</body>
+</html>

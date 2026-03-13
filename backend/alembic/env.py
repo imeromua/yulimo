@@ -9,6 +9,7 @@ load_dotenv()
 
 from database import Base
 from models import room, booking, restaurant, user
+from models import client, media, email_log, email_template, content_block, settings
 
 config = context.config
 config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
