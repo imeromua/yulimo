@@ -28,9 +28,9 @@ class Settings(BaseSettings):
     # Email (Resend)
     RESEND_API_KEY: str = ""
     FROM_EMAIL: str = "noreply@yulimo.kyiv.ua"
-    NOTIFICATION_ADMIN_EMAIL: str = "yuzko@ukr.net"
+    NOTIFICATION_ADMIN_EMAIL: str = "info@yulimo.kyiv.ua"
 
-    # Email (SMTP)
+    # Email (SMTP) — legacy, не використовується
     SMTP_HOST: str = ""
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
@@ -42,6 +42,10 @@ class Settings(BaseSettings):
 
     # Rate limiting (запитів за хвилину)
     RATE_LIMIT_PER_MINUTE: int = 60
+
+    # Telegram Bot
+    TELEGRAM_BOT_TOKEN: str = ""
+    TELEGRAM_ADMIN_CHAT_ID: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
