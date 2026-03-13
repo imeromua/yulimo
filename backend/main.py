@@ -96,11 +96,11 @@ app.include_router(rooms.router,           prefix="/api/rooms",      tags=["Но
 app.include_router(bookings.router,        prefix="/api/bookings",   tags=["Бронювання"])
 app.include_router(restaurant.router,      prefix="/api/restaurant", tags=["Ресторан"])
 app.include_router(admin.router,           prefix="/api/admin",      tags=["Адмін"])
-app.include_router(clients.router,         tags=["Клієнти"])
-app.include_router(media.router,           tags=["Медіа"])
-app.include_router(emails.router,          tags=["Email"])
-app.include_router(content.router,         tags=["Контент"])
-app.include_router(settings_router.router, tags=["Налаштування"])
+app.include_router(clients.router,         prefix="/api", tags=["Клієнти"])
+app.include_router(media.router,           prefix="/api", tags=["Медіа"])
+app.include_router(emails.router,          prefix="/api", tags=["Email"])
+app.include_router(content.router,         prefix="/api", tags=["Контент"])
+app.include_router(settings_router.router, prefix="/api", tags=["Налаштування"])
 
 
 @app.get("/api/health", tags=["Моніторинг"])
