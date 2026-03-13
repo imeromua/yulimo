@@ -18,8 +18,9 @@ from bot.states import BookingStates
 from core.config import settings
 from database import SessionLocal
 from schemas.booking import BookingCreate
-from services import booking_service, email_service, room_service
+from services import booking_service, room_service
 from services.booking_service import BookingConflictError
+from services.email_service import _is_enabled, _send, _wrap_html
 
 logger = logging.getLogger("yulimo.bot")
 
@@ -152,7 +153,7 @@ async def booking_phone(message: Message, state: FSMContext) -> None:
     await state.update_data(guest_phone=phone)
     await state.set_state(BookingStates.enter_email)
     await message.answer(
-        "📧 Email (необов'язково, введіть /skip щоб пропустити):",
+        "📧 Email (необов'язково, натисніть /skip щоб пропустити):",
         reply_markup=cancel_keyboard(),
     )
 
@@ -233,8 +234,8 @@ async def booking_guests(message: Message, state: FSMContext) -> None:
 
 @router.callback_query(lambda c: c.data == "booking:cancel")
 async def booking_cancel(callback: CallbackQuery, state: FSMContext) -> None:
-    from bot.keyboards import main_menu_keyboard
     from bot.handlers.start import WELCOME_TEXT
+    from bot.keyboards import main_menu_keyboard
 
     await state.clear()
     await callback.message.edit_text(WELCOME_TEXT, reply_markup=main_menu_keyboard())
@@ -277,16 +278,37 @@ async def booking_confirm(callback: CallbackQuery, state: FSMContext) -> None:
     finally:
         db.close()
 
-    # Email notification to admin
-    try:
-        await email_service.send_booking_notification_admin(booking, room_name)
-    except Exception as exc:
-        logger.error("Помилка відправки email адміну: %s", exc)
+    # Email адміну
+    if _is_enabled():
+        check_in = date.fromisoformat(data["check_in"])
+        check_out = date.fromisoformat(data["check_out"])
+        nights = (check_out - check_in).days
+        total = nights * data.get("price_per_night", 0)
+        subject = f"🏠 Нове бронювання №{booking.id} від {booking.guest_name}"
+        body = (
+            '<h2 style="color:#2d5a27;margin-top:0;">Нове бронювання через бота</h2>'
+            '<table style="width:100%;border-collapse:collapse;">'
+            f'<tr><td style="padding:6px 0;color:#555;">Номер:</td><td><strong>{room_name}</strong></td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Гість:</td><td>{booking.guest_name}</td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Телефон:</td><td>{booking.guest_phone}</td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Заїзд:</td><td>{check_in.strftime(DATE_FORMAT)}</td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Виїзд:</td><td>{check_out.strftime(DATE_FORMAT)}</td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Ночей:</td><td>{nights}</td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Сума:</td><td><strong>{total:.0f} грн</strong></td></tr>'
+            '</table>'
+        )
+        try:
+            await _send(
+                settings.NOTIFICATION_ADMIN_EMAIL,
+                subject,
+                _wrap_html(subject, body),
+            )
+        except Exception as exc:
+            logger.error("Помилка email адміну: %s", exc)
 
-    # Telegram notification to admin
+    # Telegram сповіщення адміну
     if settings.TELEGRAM_ADMIN_CHAT_ID:
         from bot.main import bot as _bot
-
         if _bot is not None:
             try:
                 check_in = date.fromisoformat(data["check_in"])
@@ -303,7 +325,7 @@ async def booking_confirm(callback: CallbackQuery, state: FSMContext) -> None:
                     parse_mode="HTML",
                 )
             except Exception as exc:
-                logger.error("Помилка відправки Telegram сповіщення адміну: %s", exc)
+                logger.error("Помилка Telegram сповіщення: %s", exc)
 
     await callback.message.edit_text(
         f"✅ <b>Бронювання №{booking.id} прийнято!</b>\n"
