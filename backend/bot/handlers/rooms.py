@@ -8,7 +8,6 @@ from aiogram.types import CallbackQuery, Message
 
 from bot.keyboards import room_nav_keyboard
 from bot.states import RoomStates
-from core.config import settings
 from database import SessionLocal
 from services import room_service
 
@@ -19,55 +18,81 @@ router = Router()
 BASE_URL = "https://yulimo.kyiv.ua"
 
 
-def _room_photo_url(room) -> str | None:
-    """Повертає URL фото номера або None."""
-    # Спочатку перевіряємо поле photo (рядок)
-    photo = getattr(room, "photo", None)
-    if photo:
-        if photo.startswith("http"):
-            return photo
-        return f"{BASE_URL}/images/{photo.lstrip('/')}"
-
-    # Якщо є поле photos (список)
-    photos = getattr(room, "photos", None) or []
-    if photos:
-        p = photos[0]
-        if p.startswith("http"):
-            return p
-        return f"{BASE_URL}/images/{p.lstrip('/')}"
-
-    return None
+def _rooms_to_dicts(rooms) -> list[dict]:
+    """Convert ORM об'єкти в прості словники для кешування."""
+    result = []
+    for r in rooms:
+        result.append({
+            "id": r.id,
+            "name": r.name,
+            "capacity": r.capacity,
+            "price": r.price,
+            "description": r.description or "—",
+            "amenities": r.amenities or [],
+            "photos": r.photos or [],
+        })
+    return result
 
 
-def _room_card(room, index: int, total: int) -> str:
-    amenities_list = getattr(room, "amenities", None) or []
+def _photo_url(room_dict: dict) -> str | None:
+    photos = room_dict.get("photos") or []
+    if not photos:
+        return None
+    p = photos[0]
+    if p.startswith("http"):
+        return p
+    return f"{BASE_URL}/images/{p.lstrip('/')}"
+
+
+def _room_card(room: dict, index: int, total: int) -> str:
+    amenities = room.get("amenities") or []
     amenities_str = ""
-    if amenities_list:
-        items = "\n".join(f"• {a}" for a in amenities_list)
+    if amenities:
+        items = "\n".join(f"• {a}" for a in amenities)
         amenities_str = f"\n\n✨ *Зручності:*\n{items}"
-
     return (
-        f"🏠 *{room.name}* ({index + 1}/{total})\n\n"
-        f"👥 До {room.capacity} гостей\n"
-        f"💰 {room.price:.0f} грн/ніч\n\n"
-        f"📝 {room.description or '—'}"
+        f"🏠 *{room['name']}* ({index + 1}/{total})\n\n"
+        f"👥 До {room['capacity']} гостей\n"
+        f"💰 {room['price']:.0f} грн/ніч\n\n"
+        f"📝 {room['description']}"
         f"{amenities_str}"
     )
 
 
-async def _send_room_card(
-    message: Message,
-    rooms: list,
-    index: int,
-    state: FSMContext,
-) -> None:
+async def _get_rooms_cached() -> list[dict]:
+    """Rooms з Redis-кешу, або з БД з записом в кеш."""
+    try:
+        from bot.cache import get_cached_rooms, set_cached_rooms
+        cached = await get_cached_rooms()
+        if cached is not None:
+            return cached
+    except Exception:
+        pass
+
+    db = SessionLocal()
+    try:
+        rooms = room_service.get_active_rooms(db)
+        data = _rooms_to_dicts(rooms)
+    finally:
+        db.close()
+
+    try:
+        from bot.cache import set_cached_rooms
+        await set_cached_rooms(data)
+    except Exception:
+        pass
+
+    return data
+
+
+async def _send_room_card(message: Message, rooms: list[dict], index: int, state: FSMContext) -> None:
     room = rooms[index]
     await state.update_data(room_index=index)
 
     card_text = _room_card(room, index, len(rooms))
-    keyboard = room_nav_keyboard(index, len(rooms), room.id)
+    keyboard = room_nav_keyboard(index, len(rooms), room["id"])
+    photo_url = _photo_url(room)
 
-    photo_url = _room_photo_url(room)
     if photo_url:
         try:
             await message.answer_photo(
@@ -78,55 +103,32 @@ async def _send_room_card(
             )
             return
         except Exception as exc:
-            logger.warning("Не вдалося надіслати фото для номера %s: %s", room.id, exc)
+            logger.warning("Не вдалося надіслати фото для номера %s: %s", room['id'], exc)
 
-    # Fallback: text only
     await message.answer(card_text, parse_mode="Markdown", reply_markup=keyboard)
 
 
 async def show_rooms(message: Message, state: FSMContext) -> None:
-    """Entry point for 🏠 Номери — called from start.py text handler."""
     await state.clear()
-    db = SessionLocal()
-    try:
-        rooms = room_service.get_active_rooms(db)
-    except Exception as exc:
-        logger.error("Помилка отримання номерів: %s", exc)
-        await message.answer("⚠️ Виникла помилка. Спробуйте ще раз.")
-        return
-    finally:
-        db.close()
-
+    rooms = await _get_rooms_cached()
     if not rooms:
         await message.answer("😔 На жаль, наразі немає доступних номерів.")
         return
-
     await state.set_state(RoomStates.browsing)
-    await state.update_data(room_ids=[r.id for r in rooms])
+    await state.update_data(room_index=0)
     await _send_room_card(message, rooms, 0, state)
 
 
 @router.callback_query(lambda c: c.data == "menu:rooms")
 async def cb_rooms(callback: CallbackQuery, state: FSMContext) -> None:
     await state.clear()
-    db = SessionLocal()
-    try:
-        rooms = room_service.get_active_rooms(db)
-    except Exception as exc:
-        logger.error("Помилка отримання номерів: %s", exc)
-        await callback.message.answer("⚠️ Виникла помилка. Спробуйте ще раз.")
-        await callback.answer()
-        return
-    finally:
-        db.close()
-
+    rooms = await _get_rooms_cached()
     if not rooms:
         await callback.message.answer("😔 На жаль, наразі немає доступних номерів.")
         await callback.answer()
         return
-
     await state.set_state(RoomStates.browsing)
-    await state.update_data(room_ids=[r.id for r in rooms])
+    await state.update_data(room_index=0)
     await callback.answer()
     await _send_room_card(callback.message, rooms, 0, state)
 
@@ -134,33 +136,19 @@ async def cb_rooms(callback: CallbackQuery, state: FSMContext) -> None:
 @router.callback_query(lambda c: c.data in ("room_nav:prev", "room_nav:next"))
 async def cb_room_nav(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
-    room_ids: list[int] = data.get("room_ids", [])
     current_index: int = data.get("room_index", 0)
 
-    if not room_ids:
+    rooms = await _get_rooms_cached()
+    if not rooms:
         await callback.answer()
         return
 
     if callback.data == "room_nav:prev":
         new_index = max(0, current_index - 1)
     else:
-        new_index = min(len(room_ids) - 1, current_index + 1)
+        new_index = min(len(rooms) - 1, current_index + 1)
 
     if new_index == current_index:
-        await callback.answer()
-        return
-
-    db = SessionLocal()
-    try:
-        rooms = room_service.get_active_rooms(db)
-    except Exception as exc:
-        logger.error("Помилка отримання номерів: %s", exc)
-        await callback.answer()
-        return
-    finally:
-        db.close()
-
-    if not rooms:
         await callback.answer()
         return
 

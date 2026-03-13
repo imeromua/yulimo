@@ -3,6 +3,7 @@
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from core.config import settings
@@ -15,11 +16,22 @@ dp: Dispatcher | None = None
 WEBHOOK_PATH = "/api/telegram/webhook"
 
 
+def _create_storage():
+    if settings.REDIS_URL:
+        try:
+            from redis.asyncio import from_url
+            redis_client = from_url(settings.REDIS_URL, encoding="utf-8", decode_responses=False)
+            logger.info("Використовуємо RedisStorage для FSM")
+            return RedisStorage(redis=redis_client)
+        except Exception as exc:
+            logger.warning("Не вдалося ініціалізувати RedisStorage: %s — фолбек на MemoryStorage", exc)
+    return MemoryStorage()
+
+
 def _create_bot_and_dispatcher() -> tuple[Bot, Dispatcher]:
     _bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
-    _dp = Dispatcher(storage=MemoryStorage())
+    _dp = Dispatcher(storage=_create_storage())
 
-    # Register all routers
     from bot.handlers import start, rooms, availability, booking, restaurant, info
 
     _dp.include_router(start.router)
