@@ -1,7 +1,7 @@
 """Обробник FSM-бронювання номерів."""
 
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
@@ -12,7 +12,10 @@ from bot.keyboards import (
     back_to_menu_keyboard,
     cancel_keyboard,
     confirm_keyboard,
+    quick_date_keyboard,
+    quick_guests_keyboard,
     rooms_list_keyboard,
+    skip_email_keyboard,
 )
 from bot.states import BookingStates
 from core.config import settings
@@ -49,7 +52,7 @@ async def cb_start_booking(callback: CallbackQuery, state: FSMContext) -> None:
         db.close()
 
     if not rooms:
-        await callback.message.edit_text(
+        await callback.message.answer(
             "😔 На жаль, наразі немає доступних номерів.",
             reply_markup=back_to_menu_keyboard(),
         )
@@ -57,7 +60,7 @@ async def cb_start_booking(callback: CallbackQuery, state: FSMContext) -> None:
         return
 
     await state.set_state(BookingStates.select_room)
-    await callback.message.edit_text(
+    await callback.message.answer(
         "🏠 Оберіть номер для бронювання:",
         reply_markup=rooms_list_keyboard(rooms),
     )
@@ -69,8 +72,60 @@ async def cb_book_room(callback: CallbackQuery, state: FSMContext) -> None:
     room_id = int(callback.data.split(":")[1])
     await state.update_data(room_id=room_id)
     await state.set_state(BookingStates.enter_checkin)
-    await callback.message.edit_text(
+    await callback.message.answer(
         "📅 Введіть дату заїзду (ДД.ММ.РРРР):",
+        reply_markup=quick_date_keyboard(),
+    )
+    await callback.answer()
+
+
+# ── Quick-date callbacks for checkin ──────────────────────────────────────────
+
+@router.callback_query(BookingStates.enter_checkin, lambda c: c.data and c.data.startswith("quick_date:"))
+async def booking_quick_date_checkin(callback: CallbackQuery, state: FSMContext) -> None:
+    today = date.today()
+    key = callback.data.split(":")[1]
+    if key == "today":
+        chosen = today
+    elif key == "tomorrow":
+        chosen = today + timedelta(days=1)
+    else:
+        chosen = today + timedelta(weeks=1)
+
+    await state.update_data(check_in=chosen.isoformat())
+    await state.set_state(BookingStates.enter_checkout)
+    await callback.message.answer(
+        f"✅ Дата заїзду: {chosen.strftime(DATE_FORMAT)}\n\n📅 Введіть дату виїзду (ДД.ММ.РРРР):",
+        reply_markup=quick_date_keyboard(),
+    )
+    await callback.answer()
+
+
+# ── Quick-date callbacks for checkout ─────────────────────────────────────────
+
+@router.callback_query(BookingStates.enter_checkout, lambda c: c.data and c.data.startswith("quick_date:"))
+async def booking_quick_date_checkout(callback: CallbackQuery, state: FSMContext) -> None:
+    data = await state.get_data()
+    check_in = date.fromisoformat(data["check_in"])
+    today = date.today()
+    key = callback.data.split(":")[1]
+    if key == "today":
+        chosen = today
+    elif key == "tomorrow":
+        chosen = today + timedelta(days=1)
+    else:
+        chosen = today + timedelta(weeks=1)
+
+    if chosen <= check_in:
+        await callback.answer(
+            "⚠️ Дата виїзду має бути пізніше дати заїзду!", show_alert=True
+        )
+        return
+
+    await state.update_data(check_out=chosen.isoformat())
+    await state.set_state(BookingStates.enter_name)
+    await callback.message.answer(
+        f"✅ Дата виїзду: {chosen.strftime(DATE_FORMAT)}\n\n👤 Ваше ім'я та прізвище:",
         reply_markup=cancel_keyboard(),
     )
     await callback.answer()
@@ -82,20 +137,20 @@ async def booking_checkin(message: Message, state: FSMContext) -> None:
     if parsed is None:
         await message.answer(
             "⚠️ Невірний формат дати. Введіть дату у форматі ДД.ММ.РРРР (наприклад: 25.06.2025):",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_date_keyboard(),
         )
         return
     if parsed < date.today():
         await message.answer(
             "⚠️ Дата заїзду не може бути в минулому. Введіть актуальну дату:",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_date_keyboard(),
         )
         return
     await state.update_data(check_in=parsed.isoformat())
     await state.set_state(BookingStates.enter_checkout)
     await message.answer(
         "📅 Введіть дату виїзду (ДД.ММ.РРРР):",
-        reply_markup=cancel_keyboard(),
+        reply_markup=quick_date_keyboard(),
     )
 
 
@@ -107,13 +162,13 @@ async def booking_checkout(message: Message, state: FSMContext) -> None:
     if parsed is None:
         await message.answer(
             "⚠️ Невірний формат дати. Введіть дату у форматі ДД.ММ.РРРР:",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_date_keyboard(),
         )
         return
     if parsed <= check_in:
         await message.answer(
             "⚠️ Дата виїзду має бути пізніше дати заїзду. Введіть дату виїзду:",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_date_keyboard(),
         )
         return
     await state.update_data(check_out=parsed.isoformat())
@@ -153,9 +208,22 @@ async def booking_phone(message: Message, state: FSMContext) -> None:
     await state.update_data(guest_phone=phone)
     await state.set_state(BookingStates.enter_email)
     await message.answer(
-        "📧 Email (необов'язково, натисніть /skip щоб пропустити):",
-        reply_markup=cancel_keyboard(),
+        "📧 Email (необов'язково):",
+        reply_markup=skip_email_keyboard(),
     )
+
+
+# ── Skip email via inline button ──────────────────────────────────────────────
+
+@router.callback_query(BookingStates.enter_email, lambda c: c.data == "skip_email")
+async def booking_skip_email_cb(callback: CallbackQuery, state: FSMContext) -> None:
+    await state.update_data(guest_email=None)
+    await state.set_state(BookingStates.enter_guests)
+    await callback.message.answer(
+        "👥 Кількість гостей:",
+        reply_markup=quick_guests_keyboard(),
+    )
+    await callback.answer()
 
 
 @router.message(BookingStates.enter_email, Command("skip"))
@@ -164,7 +232,7 @@ async def booking_email_skip(message: Message, state: FSMContext) -> None:
     await state.set_state(BookingStates.enter_guests)
     await message.answer(
         "👥 Кількість гостей:",
-        reply_markup=cancel_keyboard(),
+        reply_markup=quick_guests_keyboard(),
     )
 
 
@@ -175,8 +243,17 @@ async def booking_email(message: Message, state: FSMContext) -> None:
     await state.set_state(BookingStates.enter_guests)
     await message.answer(
         "👥 Кількість гостей:",
-        reply_markup=cancel_keyboard(),
+        reply_markup=quick_guests_keyboard(),
     )
+
+
+# ── Quick-guests callbacks ────────────────────────────────────────────────────
+
+@router.callback_query(BookingStates.enter_guests, lambda c: c.data and c.data.startswith("quick_guests:"))
+async def booking_quick_guests(callback: CallbackQuery, state: FSMContext) -> None:
+    guests = int(callback.data.split(":")[1])
+    await _process_guests(callback.message, state, guests)
+    await callback.answer()
 
 
 @router.message(BookingStates.enter_guests)
@@ -188,10 +265,13 @@ async def booking_guests(message: Message, state: FSMContext) -> None:
     except ValueError:
         await message.answer(
             "⚠️ Введіть коректну кількість гостей (від 1 до 20):",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_guests_keyboard(),
         )
         return
+    await _process_guests(message, state, guests)
 
+
+async def _process_guests(message: Message, state: FSMContext, guests: int) -> None:
     data = await state.get_data()
     await state.update_data(guests_count=guests)
 
@@ -238,7 +318,14 @@ async def booking_cancel(callback: CallbackQuery, state: FSMContext) -> None:
     from bot.keyboards import main_menu_keyboard
 
     await state.clear()
-    await callback.message.edit_text(WELCOME_TEXT, reply_markup=main_menu_keyboard())
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+    await callback.message.answer(
+        "❌ Бронювання скасовано.\n\n" + WELCOME_TEXT,
+        reply_markup=main_menu_keyboard(),
+    )
     await callback.answer("❌ Бронювання скасовано")
 
 

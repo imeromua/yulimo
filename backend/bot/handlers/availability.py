@@ -7,7 +7,7 @@ from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from bot.keyboards import available_rooms_keyboard, back_to_menu_keyboard, cancel_keyboard
+from bot.keyboards import back_to_menu_keyboard, book_room_keyboard, cancel_keyboard
 from bot.states import AvailabilityStates
 from database import SessionLocal
 from services import booking_service, room_service
@@ -29,7 +29,7 @@ def _parse_date(text: str) -> date | None:
 @router.callback_query(lambda c: c.data == "menu:availability")
 async def cb_availability(callback: CallbackQuery, state: FSMContext) -> None:
     await state.set_state(AvailabilityStates.enter_checkin)
-    await callback.message.edit_text(
+    await callback.message.answer(
         "📅 Введіть дату заїзду (формат: ДД.ММ.РРРР):",
         reply_markup=cancel_keyboard(),
     )
@@ -103,16 +103,11 @@ async def avail_checkout(message: Message, state: FSMContext) -> None:
         )
         return
 
-    lines = [
-        f"✅ Доступні номери на {check_in.strftime(DATE_FORMAT)} — {parsed.strftime(DATE_FORMAT)}:\n"
-    ]
-    for room in available:
-        lines.append(
-            f"🏠 <b>{room.name}</b> — {room.price:.0f} грн/ніч, до {room.capacity} гостей"
-        )
-
     await message.answer(
-        "\n".join(lines),
-        parse_mode="HTML",
-        reply_markup=available_rooms_keyboard(available),
+        f"✅ Доступні номери на {check_in.strftime(DATE_FORMAT)} — {parsed.strftime(DATE_FORMAT)}:"
     )
+    for room in available:
+        await message.answer(
+            f"🏠 {room.name} — {room.price:.0f} грн/ніч (до {room.capacity} гостей)",
+            reply_markup=book_room_keyboard(room.id),
+        )
