@@ -15,7 +15,7 @@ from core.config import settings
 from core.logging_config import error_logger, setup_logging
 from middleware.logging_mw import RequestLoggingMiddleware
 from middleware.security import SecurityHeadersMiddleware
-from routers import admin, auth, bookings, clients, content, emails, media, restaurant, rooms, settings as settings_router
+from routers import admin, auth, bookings, clients, contact, content, emails, media, restaurant, rooms, settings as settings_router
 from utils.responses import make_serializable_errors
 
 # ---------------------------------------------------------------------------
@@ -101,6 +101,7 @@ app.include_router(media.router,           prefix="/api", tags=["Медіа"])
 app.include_router(emails.router,          prefix="/api", tags=["Email"])
 app.include_router(content.router,         prefix="/api", tags=["Контент"])
 app.include_router(settings_router.router, prefix="/api", tags=["Налаштування"])
+app.include_router(contact.router,         prefix="/api", tags=["Контакт"])
 
 
 @app.get("/api/health", tags=["Моніторинг"])
