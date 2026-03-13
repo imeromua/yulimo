@@ -6,7 +6,7 @@ from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from bot.keyboards import back_to_menu_keyboard, room_nav_keyboard
+from bot.keyboards import room_nav_keyboard
 from bot.states import RoomStates
 from core.config import settings
 from database import SessionLocal
@@ -16,20 +16,31 @@ logger = logging.getLogger("yulimo.bot")
 
 router = Router()
 
+BASE_URL = "https://yulimo.kyiv.ua"
+
 
 def _room_photo_url(room) -> str | None:
-    photos = room.photos or []
-    if not photos:
-        return None
-    photo = photos[0]
-    if photo.startswith("http"):
-        return photo
-    base = settings.TELEGRAM_WEBHOOK_BASE_URL.rstrip("/")
-    return f"{base}/images/{photo}"
+    """Повертає URL фото номера або None."""
+    # Спочатку перевіряємо поле photo (рядок)
+    photo = getattr(room, "photo", None)
+    if photo:
+        if photo.startswith("http"):
+            return photo
+        return f"{BASE_URL}/images/{photo.lstrip('/')}"
+
+    # Якщо є поле photos (список)
+    photos = getattr(room, "photos", None) or []
+    if photos:
+        p = photos[0]
+        if p.startswith("http"):
+            return p
+        return f"{BASE_URL}/images/{p.lstrip('/')}"
+
+    return None
 
 
 def _room_card(room, index: int, total: int) -> str:
-    amenities_list = room.amenities or []
+    amenities_list = getattr(room, "amenities", None) or []
     amenities_str = ""
     if amenities_list:
         items = "\n".join(f"• {a}" for a in amenities_list)
@@ -49,7 +60,6 @@ async def _send_room_card(
     rooms: list,
     index: int,
     state: FSMContext,
-    edit_message_id: int | None = None,
 ) -> None:
     room = rooms[index]
     await state.update_data(room_index=index)
@@ -57,7 +67,6 @@ async def _send_room_card(
     card_text = _room_card(room, index, len(rooms))
     keyboard = room_nav_keyboard(index, len(rooms), room.id)
 
-    # Try to send photo if available
     photo_url = _room_photo_url(room)
     if photo_url:
         try:
@@ -83,19 +92,13 @@ async def show_rooms(message: Message, state: FSMContext) -> None:
         rooms = room_service.get_active_rooms(db)
     except Exception as exc:
         logger.error("Помилка отримання номерів: %s", exc)
-        await message.answer(
-            "⚠️ Виникла помилка. Спробуйте ще раз або зверніться до адміністратора.",
-            reply_markup=back_to_menu_keyboard(),
-        )
+        await message.answer("⚠️ Виникла помилка. Спробуйте ще раз.")
         return
     finally:
         db.close()
 
     if not rooms:
-        await message.answer(
-            "😔 На жаль, наразі немає доступних номерів.",
-            reply_markup=back_to_menu_keyboard(),
-        )
+        await message.answer("😔 На жаль, наразі немає доступних номерів.")
         return
 
     await state.set_state(RoomStates.browsing)
@@ -111,20 +114,14 @@ async def cb_rooms(callback: CallbackQuery, state: FSMContext) -> None:
         rooms = room_service.get_active_rooms(db)
     except Exception as exc:
         logger.error("Помилка отримання номерів: %s", exc)
-        await callback.message.answer(
-            "⚠️ Виникла помилка. Спробуйте ще раз або зверніться до адміністратора.",
-            reply_markup=back_to_menu_keyboard(),
-        )
+        await callback.message.answer("⚠️ Виникла помилка. Спробуйте ще раз.")
         await callback.answer()
         return
     finally:
         db.close()
 
     if not rooms:
-        await callback.message.answer(
-            "😔 На жаль, наразі немає доступних номерів.",
-            reply_markup=back_to_menu_keyboard(),
-        )
+        await callback.message.answer("😔 На жаль, наразі немає доступних номерів.")
         await callback.answer()
         return
 
@@ -167,7 +164,6 @@ async def cb_room_nav(callback: CallbackQuery, state: FSMContext) -> None:
         await callback.answer()
         return
 
-    # Try to delete old message before sending new card
     try:
         await callback.message.delete()
     except Exception:

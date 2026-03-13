@@ -22,8 +22,8 @@ def main_menu_keyboard() -> ReplyKeyboardMarkup:
 
 
 def back_to_menu_keyboard() -> InlineKeyboardMarkup:
+    """Порожня клавіатура — статичне меню завжди видно внизу екрану."""
     builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text="← Головне меню", callback_data="menu:main"))
     return builder.as_markup()
 
 
@@ -46,7 +46,6 @@ def room_nav_keyboard(room_index: int, total: int, room_id: int) -> InlineKeyboa
             callback_data=f"room_nav:book:{room_id}",
         )
     )
-    builder.row(InlineKeyboardButton(text="← Головне меню", callback_data="menu:main"))
     return builder.as_markup()
 
 
@@ -58,7 +57,6 @@ def room_book_keyboard(room_id: int) -> InlineKeyboardMarkup:
             callback_data=f"book_room:{room_id}",
         )
     )
-    builder.row(InlineKeyboardButton(text="← Головне меню", callback_data="menu:main"))
     return builder.as_markup()
 
 
@@ -71,7 +69,6 @@ def rooms_list_keyboard(rooms: list) -> InlineKeyboardMarkup:
                 callback_data=f"book_room:{room.id}",
             )
         )
-    builder.row(InlineKeyboardButton(text="← Головне меню", callback_data="menu:main"))
     return builder.as_markup()
 
 
@@ -84,7 +81,6 @@ def available_rooms_keyboard(rooms: list) -> InlineKeyboardMarkup:
                 callback_data=f"book_room:{room.id}",
             )
         )
-    builder.row(InlineKeyboardButton(text="← Головне меню", callback_data="menu:main"))
     return builder.as_markup()
 
 
@@ -164,4 +160,3 @@ def quick_time_keyboard() -> InlineKeyboardMarkup:
     )
     builder.row(InlineKeyboardButton(text="❌ Скасувати", callback_data="cancel"))
     return builder.as_markup()
-
