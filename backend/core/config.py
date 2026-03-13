@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 20
     DB_POOL_TIMEOUT: int = 30
 
+    # Redis
+    REDIS_URL: str = "redis://localhost:6379/0"
+
     # JWT
     SECRET_KEY: str = "change-this-to-a-very-long-random-secret-key-in-production"
     ALGORITHM: str = "HS256"
