@@ -140,7 +140,7 @@ def reorder_media(
 def public_gallery(db: Session = Depends(get_db)):
     items = (
         db.query(Media)
-        .filter(Media.section == "gallery", Media.is_active == True)
+        .filter(Media.section == "gallery", Media.is_active)
         .order_by(Media.sort_order.asc(), Media.uploaded_at.desc())
         .all()
     )

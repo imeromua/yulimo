@@ -148,7 +148,7 @@
         if (isBoolean) {
             const checked = s.value === 'true' ? 'checked' : '';
             input = `<div class="toggle-wrap">
-                <input type="checkbox" id="s-${s.key}" data-key="${s.key}" data-type="boolean" ${checked} style="width:18px;height:18px;">
+                <input type="checkbox" id="s-${s.key}" data-key="${s.key}" data-type="boolean" ${checked} onchange="this.nextElementSibling.textContent=this.checked?'Увімкнено':'Вимкнено'" style="width:18px;height:18px;">
                 <label for="s-${s.key}" style="font-size:.9rem;">${s.value === 'true' ? 'Увімкнено' : 'Вимкнено'}</label>
             </div>`;
         } else if (isLong) {

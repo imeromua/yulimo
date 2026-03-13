@@ -115,7 +115,7 @@ async def send_template_for_booking(
     """Надсилає шаблонний лист для бронювання."""
     template = db.query(EmailTemplate).filter(
         EmailTemplate.template_type == template_type,
-        EmailTemplate.is_active == True,
+        EmailTemplate.is_active,
     ).first()
 
     recipient_email = booking.guest_email or ""
