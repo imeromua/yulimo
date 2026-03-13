@@ -1,6 +1,7 @@
 """Точка входу FastAPI — CORS, middleware, маршрути, обробники помилок."""
 
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -16,6 +17,7 @@ from core.logging_config import error_logger, setup_logging
 from middleware.logging_mw import RequestLoggingMiddleware
 from middleware.security import SecurityHeadersMiddleware
 from routers import admin, auth, bookings, clients, contact, content, emails, media, restaurant, rooms, settings as settings_router
+from routers import telegram as telegram_router
 from utils.responses import make_serializable_errors
 
 # ---------------------------------------------------------------------------
@@ -29,6 +31,21 @@ logger = logging.getLogger("yulimo.main")
 # ---------------------------------------------------------------------------
 limiter = Limiter(key_func=get_remote_address, default_limits=[f"{settings.RATE_LIMIT_PER_MINUTE}/minute"])
 
+
+# ---------------------------------------------------------------------------
+# Lifespan
+# ---------------------------------------------------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if settings.TELEGRAM_BOT_TOKEN:
+        from bot.main import setup_bot
+        await setup_bot()
+    yield
+    if settings.TELEGRAM_BOT_TOKEN:
+        from bot.main import teardown_bot
+        await teardown_bot()
+
+
 # ---------------------------------------------------------------------------
 # Застосунок
 # ---------------------------------------------------------------------------
@@ -38,6 +55,7 @@ app = FastAPI(
     version=settings.VERSION,
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
+    lifespan=lifespan,
 )
 
 app.state.limiter = limiter
@@ -102,6 +120,7 @@ app.include_router(emails.router,          prefix="/api", tags=["Email"])
 app.include_router(content.router,         prefix="/api", tags=["Контент"])
 app.include_router(settings_router.router, prefix="/api", tags=["Налаштування"])
 app.include_router(contact.router,         prefix="/api", tags=["Контакт"])
+app.include_router(telegram_router.router, prefix="/api", tags=["Telegram"])
 
 
 @app.get("/api/health", tags=["Моніторинг"])
