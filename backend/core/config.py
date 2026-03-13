@@ -30,6 +30,13 @@ class Settings(BaseSettings):
     FROM_EMAIL: str = "noreply@yulimo.kyiv.ua"
     NOTIFICATION_ADMIN_EMAIL: str = "yuzko@ukr.net"
 
+    # Email (SMTP)
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASS: str = ""
+    SMTP_FROM: str = ""
+
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,https://yulimo.kyiv.ua"
 

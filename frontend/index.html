@@ -202,6 +202,13 @@
     </script>
 </head>
 <body itemscope itemtype="https://schema.org/LodgingBusiness">
+
+<!-- Season banner (shown when season_banner_enabled=true) -->
+<div id="seasonBanner" style="display:none;background:#2d5a27;color:#fff;text-align:center;padding:10px 16px;position:relative;font-size:.9rem;">
+    <span id="seasonBannerText"></span>
+    <button onclick="document.getElementById('seasonBanner').style.display='none'" style="background:none;border:none;color:#fff;position:absolute;right:16px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.2rem;" aria-label="Закрити">×</button>
+</div>
+
     <nav class="navbar" id="navbar">
         <div class="container nav-inner">
             <a href="#home" class="logo">
@@ -782,5 +789,16 @@
     </footer>
 
     <script type="module" src="js/main.js"></script>
+    <script>
+        // Load season banner from settings API
+        fetch('/api/settings').then(r => r.json()).then(json => {
+            if (!json.success) return;
+            const s = json.data;
+            if (s.season_banner_enabled === 'true' && s.season_banner_text) {
+                document.getElementById('seasonBannerText').textContent = s.season_banner_text;
+                document.getElementById('seasonBanner').style.display = 'block';
+            }
+        }).catch(() => {});
+    </script>
 </body>
 </html>

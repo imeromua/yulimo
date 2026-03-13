@@ -15,7 +15,7 @@ from core.config import settings
 from core.logging_config import error_logger, setup_logging
 from middleware.logging_mw import RequestLoggingMiddleware
 from middleware.security import SecurityHeadersMiddleware
-from routers import admin, auth, bookings, restaurant, rooms
+from routers import admin, auth, bookings, clients, content, emails, media, restaurant, rooms, settings as settings_router
 from utils.responses import make_serializable_errors
 
 # ---------------------------------------------------------------------------
@@ -91,11 +91,16 @@ async def global_exception_handler(request: Request, exc: Exception):
 # ---------------------------------------------------------------------------
 # Маршрути
 # ---------------------------------------------------------------------------
-app.include_router(auth.router,       prefix="/auth",           tags=["Автентифікація"])
-app.include_router(rooms.router,      prefix="/api/rooms",      tags=["Номери"])
-app.include_router(bookings.router,   prefix="/api/bookings",   tags=["Бронювання"])
-app.include_router(restaurant.router, prefix="/api/restaurant", tags=["Ресторан"])
-app.include_router(admin.router,      prefix="/api/admin",      tags=["Адмін"])
+app.include_router(auth.router,            prefix="/auth",           tags=["Автентифікація"])
+app.include_router(rooms.router,           prefix="/api/rooms",      tags=["Номери"])
+app.include_router(bookings.router,        prefix="/api/bookings",   tags=["Бронювання"])
+app.include_router(restaurant.router,      prefix="/api/restaurant", tags=["Ресторан"])
+app.include_router(admin.router,           prefix="/api/admin",      tags=["Адмін"])
+app.include_router(clients.router,         tags=["Клієнти"])
+app.include_router(media.router,           tags=["Медіа"])
+app.include_router(emails.router,          tags=["Email"])
+app.include_router(content.router,         tags=["Контент"])
+app.include_router(settings_router.router, tags=["Налаштування"])
 
 
 @app.get("/api/health", tags=["Моніторинг"])

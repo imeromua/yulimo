@@ -26,8 +26,14 @@ def db_engine():
 
     # Завантажуємо всі моделі, щоб Base знав таблиці
     import models.booking  # noqa: F401
+    import models.client  # noqa: F401
+    import models.content_block  # noqa: F401
+    import models.email_log  # noqa: F401
+    import models.email_template  # noqa: F401
+    import models.media  # noqa: F401
     import models.restaurant  # noqa: F401
     import models.room  # noqa: F401
+    import models.settings  # noqa: F401
     import models.user  # noqa: F401
 
     engine = create_engine(SQLITE_URL, connect_args={"check_same_thread": False})
