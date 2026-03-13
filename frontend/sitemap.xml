@@ -1,51 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://yulimo.kyiv.ua/</loc>
-    <lastmod>2026-03-10</lastmod>
+    <lastmod>2026-03-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/hero-pool.jpg</image:loc>
+      <image:title>База відпочинку Юлімо — басейн</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/gallery-forest.jpg</image:loc>
+      <image:title>Сосновий ліс на території Юлімо</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/gallery-room.jpg</image:loc>
+      <image:title>Затишний номер бази відпочинку Юлімо</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/gallery-food.jpg</image:loc>
+      <image:title>Ресторан Сосновий дім — страви</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/gallery-spa.jpg</image:loc>
+      <image:title>Сауна та SPA зона Юлімо</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/gallery-cottage.jpg</image:loc>
+      <image:title>Котеджі бази відпочинку Юлімо</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/room-standard.jpg</image:loc>
+      <image:title>Стандартний номер Юлімо</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/room-cottage.jpg</image:loc>
+      <image:title>Котедж Юлімо</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yulimo.kyiv.ua/images/room-suite.jpg</image:loc>
+      <image:title>Люкс сюіт Юлімо</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://yulimo.kyiv.ua/#about</loc>
-    <lastmod>2026-03-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://yulimo.kyiv.ua/pages/rules.html</loc>
+    <lastmod>2026-03-13</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://yulimo.kyiv.ua/#rooms</loc>
-    <lastmod>2026-03-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://yulimo.kyiv.ua/#restaurant</loc>
-    <lastmod>2026-03-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://yulimo.kyiv.ua/#menu</loc>
-    <lastmod>2026-03-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://yulimo.kyiv.ua/#services</loc>
-    <lastmod>2026-03-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://yulimo.kyiv.ua/#booking</loc>
-    <lastmod>2026-03-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://yulimo.kyiv.ua/#contacts</loc>
-    <lastmod>2026-03-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://yulimo.kyiv.ua/pages/privacy.html</loc>
+    <lastmod>2026-03-13</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 </urlset>
