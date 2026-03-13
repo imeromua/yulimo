@@ -26,3 +26,7 @@ class TableStates(StatesGroup):
 class AvailabilityStates(StatesGroup):
     enter_checkin = State()
     enter_checkout = State()
+
+
+class RoomStates(StatesGroup):
+    browsing = State()

@@ -1,13 +1,20 @@
 """Обробник FSM-резервації столика в ресторані."""
 
 import logging
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from bot.keyboards import back_to_menu_keyboard, cancel_keyboard, confirm_keyboard
+from bot.keyboards import (
+    back_to_menu_keyboard,
+    cancel_keyboard,
+    confirm_keyboard,
+    quick_date_keyboard,
+    quick_guests_keyboard,
+    quick_time_keyboard,
+)
 from bot.states import TableStates
 from core.config import settings
 from database import SessionLocal
@@ -41,10 +48,32 @@ def _parse_time(text: str) -> time | None:
 async def cb_restaurant(callback: CallbackQuery, state: FSMContext) -> None:
     await state.clear()
     await state.set_state(TableStates.enter_date)
-    await callback.message.edit_text(
+    await callback.message.answer(
         "🍽️ <b>Резервація столика</b>\n\nВведіть дату (формат: ДД.ММ.РРРР):",
         parse_mode="HTML",
-        reply_markup=cancel_keyboard(),
+        reply_markup=quick_date_keyboard(),
+    )
+    await callback.answer()
+
+
+# ── Quick-date callbacks for restaurant ───────────────────────────────────────
+
+@router.callback_query(TableStates.enter_date, lambda c: c.data and c.data.startswith("quick_date:"))
+async def restaurant_quick_date(callback: CallbackQuery, state: FSMContext) -> None:
+    today = date.today()
+    key = callback.data.split(":")[1]
+    if key == "today":
+        chosen = today
+    elif key == "tomorrow":
+        chosen = today + timedelta(days=1)
+    else:
+        chosen = today + timedelta(weeks=1)
+
+    await state.update_data(date=chosen.isoformat())
+    await state.set_state(TableStates.enter_time)
+    await callback.message.answer(
+        f"✅ Дата: {chosen.strftime(DATE_FORMAT)}\n\n🕐 Введіть час резервації (формат: ГГ:ХХ):",
+        reply_markup=quick_time_keyboard(),
     )
     await callback.answer()
 
@@ -55,21 +84,36 @@ async def table_date(message: Message, state: FSMContext) -> None:
     if parsed is None:
         await message.answer(
             "⚠️ Невірний формат дати. Введіть дату у форматі ДД.ММ.РРРР (наприклад: 25.06.2025):",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_date_keyboard(),
         )
         return
     if parsed < date.today():
         await message.answer(
             "⚠️ Дата не може бути в минулому. Введіть актуальну дату:",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_date_keyboard(),
         )
         return
     await state.update_data(date=parsed.isoformat())
     await state.set_state(TableStates.enter_time)
     await message.answer(
         "🕐 Введіть час резервації (формат: ГГ:ХХ, наприклад 18:30):",
-        reply_markup=cancel_keyboard(),
+        reply_markup=quick_time_keyboard(),
     )
+
+
+# ── Quick-time callbacks ───────────────────────────────────────────────────────
+
+@router.callback_query(TableStates.enter_time, lambda c: c.data and c.data.startswith("quick_time:"))
+async def restaurant_quick_time(callback: CallbackQuery, state: FSMContext) -> None:
+    # callback_data is "quick_time:HH:MM" — rejoin after first colon
+    time_str = callback.data[len("quick_time:"):]
+    await state.update_data(time=time_str)
+    await state.set_state(TableStates.enter_guests)
+    await callback.message.answer(
+        f"✅ Час: {time_str}\n\n👥 Кількість гостей:",
+        reply_markup=quick_guests_keyboard(),
+    )
+    await callback.answer()
 
 
 @router.message(TableStates.enter_time)
@@ -78,15 +122,29 @@ async def table_time(message: Message, state: FSMContext) -> None:
     if parsed is None:
         await message.answer(
             "⚠️ Невірний формат часу. Введіть час у форматі ГГ:ХХ (наприклад: 18:30):",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_time_keyboard(),
         )
         return
     await state.update_data(time=parsed.strftime(TIME_FORMAT))
     await state.set_state(TableStates.enter_guests)
     await message.answer(
         "👥 Кількість гостей:",
+        reply_markup=quick_guests_keyboard(),
+    )
+
+
+# ── Quick-guests callbacks ────────────────────────────────────────────────────
+
+@router.callback_query(TableStates.enter_guests, lambda c: c.data and c.data.startswith("quick_guests:"))
+async def restaurant_quick_guests(callback: CallbackQuery, state: FSMContext) -> None:
+    guests = int(callback.data.split(":")[1])
+    await state.update_data(guests_count=guests)
+    await state.set_state(TableStates.enter_name)
+    await callback.message.answer(
+        f"✅ Гостей: {guests}\n\n👤 Ваше ім'я та прізвище:",
         reply_markup=cancel_keyboard(),
     )
+    await callback.answer()
 
 
 @router.message(TableStates.enter_guests)
@@ -98,7 +156,7 @@ async def table_guests(message: Message, state: FSMContext) -> None:
     except ValueError:
         await message.answer(
             "⚠️ Введіть коректну кількість гостей (від 1 до 50):",
-            reply_markup=cancel_keyboard(),
+            reply_markup=quick_guests_keyboard(),
         )
         return
     await state.update_data(guests_count=guests)
@@ -161,7 +219,14 @@ async def table_cancel(callback: CallbackQuery, state: FSMContext) -> None:
     from bot.keyboards import main_menu_keyboard
 
     await state.clear()
-    await callback.message.edit_text(WELCOME_TEXT, reply_markup=main_menu_keyboard())
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+    await callback.message.answer(
+        "❌ Резервацію скасовано.\n\n" + WELCOME_TEXT,
+        reply_markup=main_menu_keyboard(),
+    )
     await callback.answer("❌ Резервацію скасовано")
 
 
@@ -199,7 +264,7 @@ async def table_confirm(callback: CallbackQuery, state: FSMContext) -> None:
         body = (
             '<h2 style="color:#2d5a27;margin-top:0;">Нова резервація через бота</h2>'
             '<table style="width:100%;border-collapse:collapse;">'
-            f'<tr><td style="padding:6px 0;color:#555;">Ім\'\u044f:</td><td><strong>{reservation.guest_name}</strong></td></tr>'
+            f'<tr><td style="padding:6px 0;color:#555;">Ім\'я:</td><td><strong>{reservation.guest_name}</strong></td></tr>'
             f'<tr><td style="padding:6px 0;color:#555;">Телефон:</td><td>{reservation.guest_phone}</td></tr>'
             f'<tr><td style="padding:6px 0;color:#555;">Дата:</td><td>{reservation.date.strftime(DATE_FORMAT)}</td></tr>'
             f'<tr><td style="padding:6px 0;color:#555;">Час:</td><td>{reservation.time.strftime(TIME_FORMAT)}</td></tr>'
