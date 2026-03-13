@@ -1,11 +1,8 @@
-"""Email-сервіс через smtplib з логуванням до EmailLog."""
+"""Email-сервіс через Resend SDK з логуванням до EmailLog."""
 
-import asyncio
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from typing import Any, Optional
 
+import resend
 from sqlalchemy.orm import Session
 
 from core.config import settings
@@ -14,8 +11,8 @@ from models.email_log import EmailLog
 from models.email_template import EmailTemplate
 
 
-def _is_smtp_enabled() -> bool:
-    return bool(getattr(settings, "SMTP_HOST", "") and getattr(settings, "SMTP_USER", ""))
+def _is_resend_enabled() -> bool:
+    return bool(getattr(settings, "RESEND_API_KEY", ""))
 
 
 def _log_email(
@@ -45,30 +42,14 @@ def _log_email(
     return log
 
 
-def _send_smtp_sync(to: str, subject: str, html: str) -> None:
-    smtp_host = getattr(settings, "SMTP_HOST", "")
-    smtp_port = int(getattr(settings, "SMTP_PORT", 587))
-    smtp_user = getattr(settings, "SMTP_USER", "")
-    smtp_pass = getattr(settings, "SMTP_PASS", "")
-    smtp_from = getattr(settings, "SMTP_FROM", smtp_user)
-
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = smtp_from
-    msg["To"] = to
-    msg.attach(MIMEText(html, "html", "utf-8"))
-
-    with smtplib.SMTP(smtp_host, smtp_port) as server:
-        server.ehlo()
-        if smtp_port != 25:
-            server.starttls()
-        if smtp_user:
-            server.login(smtp_user, smtp_pass)
-        server.sendmail(smtp_from, [to], msg.as_string())
-
-
-async def _send_smtp(to: str, subject: str, html: str) -> None:
-    await asyncio.to_thread(_send_smtp_sync, to, subject, html)
+def _send_resend(to: str, subject: str, html: str) -> None:
+    resend.api_key = settings.RESEND_API_KEY
+    resend.Emails.send({
+        "from": settings.FROM_EMAIL,
+        "to": [to],
+        "subject": subject,
+        "html": html,
+    })
 
 
 def _render_template(body_html: str, context: dict) -> str:
@@ -88,8 +69,8 @@ async def send_manual_email(
     error_msg = None
     result_status = "sent"
     try:
-        if _is_smtp_enabled():
-            await _send_smtp(recipient_email, subject, body)
+        if _is_resend_enabled():
+            _send_resend(recipient_email, subject, body)
     except Exception as exc:
         error_logger.error("Помилка відправки email до %s: %s", recipient_email, exc)
         error_msg = str(exc)
@@ -160,8 +141,8 @@ async def send_template_for_booking(
     error_msg = None
     result_status = "sent"
     try:
-        if _is_smtp_enabled():
-            await _send_smtp(recipient_email, rendered_subject, rendered_body)
+        if _is_resend_enabled():
+            _send_resend(recipient_email, rendered_subject, rendered_body)
     except Exception as exc:
         error_logger.error("Помилка відправки шаблону '%s' для бронювання #%s: %s", template_type, booking.id, exc)
         error_msg = str(exc)
