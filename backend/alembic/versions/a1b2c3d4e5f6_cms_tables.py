@@ -1,7 +1,7 @@
 """CMS: clients, media, email_logs, email_templates, content_blocks, site_settings, booking.client_id
 
 Revision ID: a1b2c3d4e5f6
-Revises: 03a9b44482dd
+Revises: f4654c18f14a
 Create Date: 2026-03-13 06:00:00.000000
 
 """
@@ -12,7 +12,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "a1b2c3d4e5f6"
-down_revision: Union[str, None] = "03a9b44482dd"
+down_revision: Union[str, None] = "f4654c18f14a"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -28,9 +28,9 @@ def upgrade() -> None:
         sa.Column("birthday", sa.Date(), nullable=True),
         sa.Column("notes", sa.Text(), nullable=True),
         sa.Column("source", sa.String(20), nullable=True),
-        sa.Column("is_active", sa.Boolean(), nullable=True, server_default=sa.text("1")),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)")),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)")),
+        sa.Column("is_active", sa.Boolean(), nullable=True, server_default=sa.text("true")),
+        sa.Column("created_at", sa.DateTime(), server_default=sa.text("CURRENT_TIMESTAMP")),
+        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("CURRENT_TIMESTAMP")),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("phone"),
     )
@@ -50,8 +50,8 @@ def upgrade() -> None:
         sa.Column("section", sa.String(50), nullable=False, server_default="other"),
         sa.Column("title_uk", sa.String(255), nullable=True),
         sa.Column("sort_order", sa.Integer(), nullable=True, server_default=sa.text("0")),
-        sa.Column("is_active", sa.Boolean(), nullable=True, server_default=sa.text("1")),
-        sa.Column("uploaded_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)")),
+        sa.Column("is_active", sa.Boolean(), nullable=True, server_default=sa.text("true")),
+        sa.Column("uploaded_at", sa.DateTime(), server_default=sa.text("CURRENT_TIMESTAMP")),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("filename"),
     )
@@ -68,7 +68,7 @@ def upgrade() -> None:
         sa.Column("template_type", sa.String(50), nullable=True),
         sa.Column("status", sa.String(20), nullable=True, server_default="pending"),
         sa.Column("booking_id", sa.Integer(), nullable=True),
-        sa.Column("sent_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)")),
+        sa.Column("sent_at", sa.DateTime(), server_default=sa.text("CURRENT_TIMESTAMP")),
         sa.Column("error_message", sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -82,8 +82,8 @@ def upgrade() -> None:
         sa.Column("subject", sa.String(255), nullable=False),
         sa.Column("body_html", sa.Text(), nullable=False),
         sa.Column("template_type", sa.String(50), nullable=False),
-        sa.Column("is_active", sa.Boolean(), nullable=True, server_default=sa.text("1")),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)")),
+        sa.Column("is_active", sa.Boolean(), nullable=True, server_default=sa.text("true")),
+        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("CURRENT_TIMESTAMP")),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
         sa.UniqueConstraint("template_type"),
@@ -157,7 +157,7 @@ def upgrade() -> None:
         sa.Column("value", sa.Text(), nullable=False, server_default=""),
         sa.Column("block_type", sa.String(20), nullable=True, server_default="text"),
         sa.Column("section", sa.String(50), nullable=True, server_default="other"),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)")),
+        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("CURRENT_TIMESTAMP")),
         sa.PrimaryKeyConstraint("key"),
     )
 
