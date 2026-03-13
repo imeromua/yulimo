@@ -147,7 +147,7 @@
             </div>
 
             <div class="page-contact-note">
-                З усіх питань звертайтесь до адміністрації: <a href="tel:+380735376037">+38 (073) 537-60-37</a> або <a href="mailto:yuzko@ukr.net">yuzko@ukr.net</a>
+                <button class="btn btn-outline contact-popup-trigger" onclick="openContactPopup()">Написати нам</button>
             </div>
         </div>
     </main>
@@ -171,7 +171,7 @@
                     <h5>Контакти</h5>
                     <span class="footer-placeholder">📍 Пуща-Водиця, Київ</span>
                     <a href="tel:+380735376037">+38 (073) 537-60-37</a>
-                    <a href="mailto:yuzko@ukr.net">yuzko@ukr.net</a>
+                    <a href="mailto:info@yulimo.kyiv.ua">info@yulimo.kyiv.ua</a>
                 </div>
                 <div class="footer-legal">
                     <h5>Юридичне</h5>
@@ -185,33 +185,75 @@
         </div>
     </footer>
 
-    <script type="module">
-        const burger = document.getElementById('burger');
-        const navLinks = document.getElementById('navLinks');
-        const navBtn = document.querySelector('.nav-btn');
+    <div id="contactPopupOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:16px; padding:32px; max-width:480px; width:90%; position:relative;">
+            <button onclick="closeContactPopup()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:24px; cursor:pointer; line-height:1;" aria-label="Закрити">&times;</button>
+            <h2 style="margin-top:0; margin-bottom:24px;">Напишіть нам</h2>
+            <form id="contactForm" onsubmit="submitContactForm(event)">
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; margin-bottom:6px; font-weight:500;">Ім'я</label>
+                    <input type="text" id="contactName" required placeholder="Ваше ім'я" style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:16px; box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; margin-bottom:6px; font-weight:500;">Email</label>
+                    <input type="email" id="contactEmail" required placeholder="your@email.com" style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:16px; box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; margin-bottom:6px; font-weight:500;">Повідомлення</label>
+                    <textarea id="contactMessage" required placeholder="Ваше повідомлення..." rows="5" style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:16px; box-sizing:border-box; resize:vertical;"></textarea>
+                </div>
+                <div id="contactFormMsg" style="display:none; margin-bottom:16px; padding:12px; border-radius:8px;"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Надіслати</button>
+            </form>
+        </div>
+    </div>
 
-        burger?.addEventListener('click', () => {
-            const open = navLinks.classList.toggle('open');
-            burger.classList.toggle('active', open);
-            burger.setAttribute('aria-expanded', open);
-            document.body.classList.toggle('menu-open', open);
+    <script>
+        function openContactPopup() {
+            const overlay = document.getElementById('contactPopupOverlay');
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeContactPopup() {
+            const overlay = document.getElementById('contactPopupOverlay');
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+            const msg = document.getElementById('contactFormMsg');
+            msg.style.display = 'none';
+            document.getElementById('contactForm').reset();
+        }
+        document.getElementById('contactPopupOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeContactPopup();
         });
-
-        navLinks?.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('open');
-                burger?.classList.remove('active');
-                burger?.setAttribute('aria-expanded', 'false');
-                document.body.classList.remove('menu-open');
-            });
-        });
-
-        navBtn?.addEventListener('click', () => {
-            navLinks.classList.remove('open');
-            burger?.classList.remove('active');
-            burger?.setAttribute('aria-expanded', 'false');
-            document.body.classList.remove('menu-open');
-        });
+        async function submitContactForm(e) {
+            e.preventDefault();
+            const name = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const message = document.getElementById('contactMessage').value.trim();
+            const msgEl = document.getElementById('contactFormMsg');
+            try {
+                const resp = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, email, message}),
+                });
+                const result = await resp.json();
+                if (resp.ok && result.success) {
+                    msgEl.textContent = 'Дякуємо! Ми відповімо найближчим часом.';
+                    msgEl.style.display = 'block';
+                    msgEl.style.background = '#d4edda';
+                    msgEl.style.color = '#155724';
+                    setTimeout(closeContactPopup, 2000);
+                } else {
+                    throw new Error('server');
+                }
+            } catch (_) {
+                msgEl.textContent = 'Виникла помилка. Будь ласка, спробуйте пізніше.';
+                msgEl.style.display = 'block';
+                msgEl.style.background = '#f8d7da';
+                msgEl.style.color = '#721c24';
+            }
+        }
     </script>
 </body>
 </html>
