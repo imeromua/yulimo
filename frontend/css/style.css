@@ -124,9 +124,12 @@ body.menu-open { overflow: hidden; }
 .hero-bg {
     position: absolute; inset: 0;
     background:
-        radial-gradient(circle at 20% 25%, rgba(201,168,76,0.25), transparent 28%),
-        radial-gradient(circle at 80% 15%, rgba(98,160,112,0.18), transparent 24%),
-        linear-gradient(135deg, #07110b 0%, #102719 38%, #173927 72%, #244d37 100%);
+        radial-gradient(circle at 20% 25%, rgba(201,168,76,0.2), transparent 28%),
+        radial-gradient(circle at 80% 15%, rgba(98,160,112,0.14), transparent 24%),
+        linear-gradient(135deg, rgba(7,17,11,0.65) 0%, rgba(16,39,25,0.55) 38%, rgba(23,57,39,0.45) 72%, rgba(36,77,55,0.35) 100%),
+        url('../images/grok_image_1773358958168.jpg');
+    background-size: cover;
+    background-position: center;
 }
 .hero-overlay {
     position: absolute; inset: 0;
@@ -440,13 +443,19 @@ body.menu-open { overflow: hidden; }
     background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.18));
 }
 .room-photo-one {
-    background: linear-gradient(135deg, #6f8d69 0%, #36492e 55%, #132116 100%);
+    background: linear-gradient(135deg, rgba(111,141,105,0.2) 0%, rgba(54,73,46,0.15) 55%, rgba(19,33,22,0.1) 100%), url('../images/grok_image_1773358533743.jpg');
+    background-size: cover;
+    background-position: center;
 }
 .room-photo-two {
-    background: linear-gradient(135deg, #87643d 0%, #345a43 48%, #11241a 100%);
+    background: linear-gradient(135deg, rgba(135,100,61,0.2) 0%, rgba(52,90,67,0.15) 48%, rgba(17,36,26,0.1) 100%), url('../images/grok_image_1773358813728.jpg');
+    background-size: cover;
+    background-position: center;
 }
 .room-photo-three {
-    background: linear-gradient(135deg, #7e6c58 0%, #506544 45%, #1b2a18 100%);
+    background: linear-gradient(135deg, rgba(126,108,88,0.2) 0%, rgba(80,101,68,0.15) 45%, rgba(27,42,24,0.1) 100%), url('../images/grok_image_1773358602548.jpg');
+    background-size: cover;
+    background-position: center;
 }
 .room-photo-badge {
     position: absolute;
@@ -508,11 +517,31 @@ body.menu-open { overflow: hidden; }
     margin-bottom: 10px;
 }
 .gallery-card-body p { color: #5c745e; }
-.gallery-forest { background: linear-gradient(180deg, rgba(14,35,24,0.12), rgba(14,35,24,0.02)), linear-gradient(135deg, #183426 0%, #375c43 40%, #c19f57 100%); }
-.gallery-room { background: linear-gradient(135deg, #cbb8a1 0%, #8da17c 55%, #4c6646 100%); }
-.gallery-food { background: linear-gradient(135deg, #56351a 0%, #9c6d3a 48%, #f2d07a 100%); }
-.gallery-spa { background: linear-gradient(135deg, #314b3c 0%, #6f8a7c 42%, #d8c7a8 100%); }
-.gallery-cottage { background: linear-gradient(135deg, #49311d 0%, #7a5b3f 40%, #2e4c36 100%); }
+.gallery-forest {
+    background: linear-gradient(180deg, rgba(14,35,24,0.12), rgba(14,35,24,0.02)), url('../images/grok_image_1773358371065.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.gallery-room {
+    background: linear-gradient(135deg, rgba(203,184,161,0.15) 0%, rgba(141,161,124,0.1) 55%, rgba(76,102,70,0.1) 100%), url('../images/grok_image_1773358524433.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.gallery-food {
+    background: linear-gradient(135deg, rgba(86,53,26,0.15) 0%, rgba(156,109,58,0.1) 48%, rgba(242,208,122,0.1) 100%), url('../images/grok_image_1773358666279.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.gallery-spa {
+    background: linear-gradient(135deg, rgba(49,75,60,0.15) 0%, rgba(111,138,124,0.1) 42%, rgba(216,199,168,0.1) 100%), url('../images/grok_image_1773358961887.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.gallery-cottage {
+    background: linear-gradient(135deg, rgba(73,49,29,0.15) 0%, rgba(122,91,63,0.1) 40%, rgba(46,76,54,0.1) 100%), url('../images/grok_image_1773358462818.jpg');
+    background-size: cover;
+    background-position: center;
+}
 
 .restaurant-features { list-style: none; margin-bottom: 32px; }
 .restaurant-features li {
@@ -531,8 +560,10 @@ body.menu-open { overflow: hidden; }
     border-radius: 28px;
     color: var(--white);
     background:
-        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.18)),
-        linear-gradient(135deg, #173022 0%, #2e5a42 50%, #9e7c43 100%);
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.35)),
+        url('../images/grok_image_1773358680236.jpg');
+    background-size: cover;
+    background-position: center;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
