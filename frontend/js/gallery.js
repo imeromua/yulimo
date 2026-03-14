@@ -28,70 +28,72 @@ const GALLERY_GROUPS = {
 let currentGroup  = [];
 let currentIndex  = 0;
 
-const lightbox  = document.getElementById('lightbox');
-const lbImg     = document.getElementById('lb-img');
-const lbCounter = document.getElementById('lb-counter');
-const lbClose   = document.getElementById('lb-close');
-const lbPrev    = document.getElementById('lb-prev');
-const lbNext    = document.getElementById('lb-next');
+document.addEventListener('DOMContentLoaded', () => {
+    const lightbox  = document.getElementById('lightbox');
+    const lbImg     = document.getElementById('lb-img');
+    const lbCounter = document.getElementById('lb-counter');
+    const lbClose   = document.getElementById('lb-close');
+    const lbPrev    = document.getElementById('lb-prev');
+    const lbNext    = document.getElementById('lb-next');
 
-function openLightbox(group, index) {
-    currentGroup = group;
-    currentIndex = index;
-    updateLightbox();
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
-}
+    function openLightbox(group, index) {
+        currentGroup = group;
+        currentIndex = index;
+        updateLightbox();
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
 
-function closeLightbox() {
-    lightbox.classList.remove('open');
-    document.body.style.overflow = '';
-    lbImg.src = '';
-}
+    function closeLightbox() {
+        lightbox.classList.remove('open');
+        document.body.style.overflow = '';
+        lbImg.src = '';
+    }
 
-function updateLightbox() {
-    const filename = currentGroup[currentIndex];
-    lbImg.src = `/images/${filename}`;
-    lbImg.alt = filename.replace(/\.[^.]+$/, '');
-    lbCounter.textContent = `${currentIndex + 1} / ${currentGroup.length}`;
-    lbPrev.style.display = currentGroup.length > 1 ? '' : 'none';
-    lbNext.style.display = currentGroup.length > 1 ? '' : 'none';
-}
+    function updateLightbox() {
+        const filename = currentGroup[currentIndex];
+        lbImg.src = `/images/${filename}`;
+        lbImg.alt = filename.replace(/\.[^.]+$/, '');
+        lbCounter.textContent = `${currentIndex + 1} / ${currentGroup.length}`;
+        lbPrev.style.display = currentGroup.length > 1 ? '' : 'none';
+        lbNext.style.display = currentGroup.length > 1 ? '' : 'none';
+    }
 
-function showPrev() {
-    currentIndex = (currentIndex - 1 + currentGroup.length) % currentGroup.length;
-    updateLightbox();
-}
+    function showPrev() {
+        currentIndex = (currentIndex - 1 + currentGroup.length) % currentGroup.length;
+        updateLightbox();
+    }
 
-function showNext() {
-    currentIndex = (currentIndex + 1) % currentGroup.length;
-    updateLightbox();
-}
+    function showNext() {
+        currentIndex = (currentIndex + 1) % currentGroup.length;
+        updateLightbox();
+    }
 
-/* ── Event listeners ──────────────────────────── */
+    /* ── Event listeners ──────────────────────────── */
 
-lbClose.addEventListener('click', closeLightbox);
-lbPrev.addEventListener('click', showPrev);
-lbNext.addEventListener('click', showNext);
+    lbClose.addEventListener('click', closeLightbox);
+    lbPrev.addEventListener('click', showPrev);
+    lbNext.addEventListener('click', showNext);
 
-lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-});
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
 
-document.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('open')) return;
-    if (e.key === 'Escape')     closeLightbox();
-    if (e.key === 'ArrowLeft')  showPrev();
-    if (e.key === 'ArrowRight') showNext();
-});
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('open')) return;
+        if (e.key === 'Escape')     closeLightbox();
+        if (e.key === 'ArrowLeft')  showPrev();
+        if (e.key === 'ArrowRight') showNext();
+    });
 
-/* ── Bind gallery cards ───────────────────────── */
+    /* ── Bind gallery cards ───────────────────────── */
 
-document.querySelectorAll('.gallery-card[data-gallery]').forEach((card) => {
-    card.addEventListener('click', () => {
-        const groupKey = card.dataset.gallery;
-        const group    = GALLERY_GROUPS[groupKey];
-        if (!group || !group.length) return;
-        openLightbox(group, 0);
+    document.querySelectorAll('.gallery-card[data-gallery]').forEach((card) => {
+        card.addEventListener('click', () => {
+            const groupKey = card.dataset.gallery;
+            const group    = GALLERY_GROUPS[groupKey];
+            if (!group || !group.length) return;
+            openLightbox(group, 0);
+        });
     });
 });
