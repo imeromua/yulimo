@@ -1,6 +1,7 @@
 """Обробник перегляду номерів."""
 
 import logging
+from urllib.parse import quote
 
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
@@ -41,7 +42,8 @@ def _photo_url(room_dict: dict) -> str | None:
     p = photos[0]
     if p.startswith("http"):
         return p
-    return f"{BASE_URL}/images/{p.lstrip('/')}"
+    filename = p.lstrip('/')
+    return f"{BASE_URL}/images/{quote(filename, safe='')}"
 
 
 def _room_card(room: dict, index: int, total: int) -> str:
