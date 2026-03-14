@@ -28,3 +28,4 @@ htmlcov/
 # Docker
 .dockerignore
 backend/yulimo_db_dump.sql
+*.sql
