@@ -1,5 +1,7 @@
 """Адміністративні маршрути (захищені JWT + роллю admin)."""
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -14,7 +16,7 @@ from services.booking_service import (
     update_booking_status,
 )
 from services.restaurant_service import get_all_table_reservations
-from services.restaurant_service import get_all_menu_items
+from services.restaurant_service import get_menu as get_menu_items
 from services import email_service
 
 router = APIRouter()
@@ -61,10 +63,10 @@ def get_table_reservations_endpoint(
 
 @router.get("/menu")
 def get_admin_menu_endpoint(
-    category: str = "",
+    category: Optional[str] = None,
     db: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
     """Усі позиції меню включно з неактивними (тільки для адміністраторів)."""
-    return get_all_menu_items(db, category or None)
+    return get_menu_items(db, category, include_inactive=True)
 

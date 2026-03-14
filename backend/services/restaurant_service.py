@@ -8,17 +8,15 @@ from models.restaurant import MenuItem, TableReservation
 from schemas.restaurant import MenuItemCreate, MenuItemUpdate, TableReservationCreate
 
 
-def get_menu(db: Session, category: Optional[str] = None) -> list[MenuItem]:
-    """Повертає активні позиції меню, опціонально фільтруючи за категорією."""
-    q = db.query(MenuItem).filter(MenuItem.is_active == True)
-    if category:
-        q = q.filter(MenuItem.category == category)
-    return q.all()
-
-
-def get_all_menu_items(db: Session, category: Optional[str] = None) -> list[MenuItem]:
-    """Повертає всі позиції меню (включно з неактивними), для адмін-панелі."""
+def get_menu(db: Session, category: Optional[str] = None, include_inactive: bool = False) -> list[MenuItem]:
+    """Повертає позиції меню, опціонально фільтруючи за категорією.
+    
+    Якщо include_inactive=False (за замовчуванням) — тільки активні страви.
+    Якщо include_inactive=True — усі, включно з неактивними (для адмін-панелі).
+    """
     q = db.query(MenuItem)
+    if not include_inactive:
+        q = q.filter(MenuItem.is_active == True)
     if category:
         q = q.filter(MenuItem.category == category)
     return q.order_by(MenuItem.id).all()
