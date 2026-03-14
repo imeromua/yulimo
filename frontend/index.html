@@ -210,7 +210,7 @@
                 <li><a href="#rooms">Номери</a></li>
                 <li><a href="#gallery">Галерея</a></li>
                 <li><a href="#restaurant">Ресторан</a></li>
-                <li><a href="#menu">Меню</a></li>
+                <li><a href="pages/menu.html">Меню</a></li>
                 <li><a href="#services">Послуги</a></li>
                 <li><a href="#contacts">Контакти</a></li>
             </ul>
@@ -233,7 +233,7 @@
                 <p class="hero-subtitle" data-content="hero_subtitle">Юлімо — заміський простір серед сосен, де поєднуються тиша лісу, затишні номери, ресторан з домашньою кухнею та атмосфера справжнього перезавантаження.</p>
                 <div class="hero-actions">
                     <a href="#booking" class="btn btn-primary btn-lg">Забронювати номер</a>
-                    <a href="#menu" class="btn btn-outline btn-lg">Переглянути меню</a>
+                    <a href="pages/menu.html" class="btn btn-outline btn-lg">Переглянути меню</a>
                 </div>
                 <div class="hero-phones">
                     <a href="tel:+380735376037" class="hero-phone" data-setting="contact_phone_1">📞 +38 (073) 537-60-37</a>
@@ -437,7 +437,7 @@
                 <p class="section-subtitle">Атмосфера комплексу, номерів і відпочинку в деталях.</p>
             </div>
             <div class="gallery-grid">
-                <article class="gallery-card gallery-card-tall reveal">
+                <article class="gallery-card gallery-card-tall reveal" data-gallery="forest" style="cursor:pointer;">
                     <div class="gallery-card-media gallery-forest" aria-label="Сосновий ліс на території Юлімо"></div>
                     <div class="gallery-card-body">
                         <span>Територія</span>
@@ -445,7 +445,7 @@
                         <p>Вечірній настрій заміського комплексу з глибокими зеленими відтінками та м'яким золотим світлом.</p>
                     </div>
                 </article>
-                <article class="gallery-card reveal">
+                <article class="gallery-card reveal" data-gallery="rooms" style="cursor:pointer;">
                     <div class="gallery-card-media gallery-room" aria-label="Затишний номер бази відпочинку Юлімо"></div>
                     <div class="gallery-card-body">
                         <span>Номери</span>
@@ -453,7 +453,7 @@
                         <p>Світлі текстури, дерево, натуральні тканини та великий акцент на затишок.</p>
                     </div>
                 </article>
-                <article class="gallery-card reveal">
+                <article class="gallery-card reveal" data-gallery="food" style="cursor:pointer;">
                     <div class="gallery-card-media gallery-food" aria-label="Ресторан Сосновий дім — страви"></div>
                     <div class="gallery-card-body">
                         <span>Ресторан</span>
@@ -461,7 +461,7 @@
                         <p>Домашня кухня у сучасній візуальній подачі для сімейних вечорів і святкувань.</p>
                     </div>
                 </article>
-                <article class="gallery-card reveal">
+                <article class="gallery-card reveal" data-gallery="spa" style="cursor:pointer;">
                     <div class="gallery-card-media gallery-spa" aria-label="Сауна та SPA зона Юлімо"></div>
                     <div class="gallery-card-body">
                         <span>Релакс</span>
@@ -469,7 +469,7 @@
                         <p>Тепле дерево, приглушене світло і спокійний настрій без зайвого шуму.</p>
                     </div>
                 </article>
-                <article class="gallery-card reveal">
+                <article class="gallery-card reveal" data-gallery="cottage" style="cursor:pointer;">
                     <div class="gallery-card-media gallery-cottage" aria-label="Котеджі бази відпочинку Юлімо"></div>
                     <div class="gallery-card-body">
                         <span>Котеджі</span>
@@ -496,7 +496,7 @@
                         <li>🎉 Формати для вечерь, подій і святкувань</li>
                     </ul>
                     <div class="restaurant-actions">
-                        <a href="#menu" class="btn btn-primary">Переглянути меню</a>
+                        <a href="pages/menu.html" class="btn btn-primary">Переглянути меню</a>
                         <a href="#booking" class="btn btn-outline">Забронювати столик</a>
                     </div>
                 </div>
@@ -795,6 +795,7 @@
 
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/content-loader.js"></script>
+    <script type="module" src="js/gallery.js"></script>
     <script>
         // Load season banner from settings API
         fetch('/api/settings').then(r => r.json()).then(json => {
@@ -806,5 +807,12 @@
             }
         }).catch(() => {});
     </script>
+    <div id="lightbox" class="lightbox">
+      <button id="lb-close" class="lb-close" aria-label="Закрити">×</button>
+      <button id="lb-prev" class="lb-prev" aria-label="Попереднє фото">‹</button>
+      <img id="lb-img" src="" class="lb-img" alt="">
+      <button id="lb-next" class="lb-next" aria-label="Наступне фото">›</button>
+      <div id="lb-counter" class="lb-counter"></div>
+    </div>
 </body>
 </html>

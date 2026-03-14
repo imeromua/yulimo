@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Меню ресторану — Юлімо</title>
+    <meta name="description" content="Меню ресторану «Сосновий дім» бази відпочинку Юлімо — закуски, основні страви, супи, десерти, напої та сніданки.">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <nav class="navbar scrolled" id="navbar">
+        <div class="container nav-inner">
+            <a href="../index.html" class="logo">
+                <span class="logo-icon">🌲</span>
+                <span class="logo-text">ЮЛІМО</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="../index.html#about">Про нас</a></li>
+                <li><a href="../index.html#rooms">Номери</a></li>
+                <li><a href="../index.html#gallery">Галерея</a></li>
+                <li><a href="../index.html#restaurant">Ресторан</a></li>
+                <li><a href="menu.html" class="active">Меню</a></li>
+                <li><a href="../index.html#services">Послуги</a></li>
+                <li><a href="../index.html#contacts">Контакти</a></li>
+            </ul>
+            <a href="../index.html#booking" class="btn btn-primary nav-btn">Забронювати</a>
+            <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="navLinks">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="menu-page-hero">
+        <div class="menu-page-hero-content">
+            <h1>Меню ресторану «Сосновий дім»</h1>
+            <p>Домашня кухня у сучасній подачі — від ситних сніданків до святкових вечерь</p>
+            <a href="../index.html#booking" class="btn btn-primary">Забронювати столик</a>
+        </div>
+    </div>
+
+    <main style="background:var(--beige);min-height:60vh;">
+        <div class="container">
+            <div class="menu-filter-bar" id="filterBar">
+                <button class="menu-filter-btn active" data-category="">Всі</button>
+                <button class="menu-filter-btn" data-category="starters">Закуски</button>
+                <button class="menu-filter-btn" data-category="mains">Основні страви</button>
+                <button class="menu-filter-btn" data-category="soups">Супи</button>
+                <button class="menu-filter-btn" data-category="grill">Гриль</button>
+                <button class="menu-filter-btn" data-category="desserts">Десерти</button>
+                <button class="menu-filter-btn" data-category="drinks">Напої</button>
+            </div>
+
+            <div class="menu-items-grid" id="menuGrid">
+                <div class="menu-empty-state">
+                    <p>Завантаження меню…</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">🌲 ЮЛІМО</div>
+                    <p>База відпочинку серед сосен Пущі-Водиці. Номери, ресторан, сауна, риболовля та події в атмосфері заміського комфорту.</p>
+                </div>
+                <div class="footer-links">
+                    <h5>Навігація</h5>
+                    <a href="../index.html#rooms">Номери</a>
+                    <a href="../index.html#restaurant">Ресторан</a>
+                    <a href="../index.html#gallery">Галерея</a>
+                    <a href="../index.html#booking">Бронювання</a>
+                    <a href="../index.html#about">Про нас</a>
+                </div>
+                <div class="footer-contacts">
+                    <h5>Контакти</h5>
+                    <span class="footer-placeholder">📍 Пуща-Водиця, Київ</span>
+                    <a href="tel:+380735376037">+38 (073) 537-60-37</a>
+                    <a href="mailto:info@yulimo.kyiv.ua">info@yulimo.kyiv.ua</a>
+                </div>
+                <div class="footer-legal">
+                    <h5>Юридичне</h5>
+                    <a href="rules.html">Правила проживання</a>
+                    <a href="privacy.html">Політика конфіденційності</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Юлімо · ФОП Юзько О.С.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        const CATEGORY_LABELS = {
+            starters: 'Закуски',
+            soups:    'Супи',
+            mains:    'Основні страви',
+            grill:    'Гриль',
+            desserts: 'Десерти',
+            drinks:   'Напої',
+        };
+
+        let allItems = [];
+        let activeCategory = '';
+
+        const grid     = document.getElementById('menuGrid');
+        const filterBar = document.getElementById('filterBar');
+
+        function esc(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function renderItems(items) {
+            const visible = items.filter(i => i.is_active !== false);
+            if (!visible.length) {
+                grid.innerHTML = '<div class="menu-empty-state"><p>Страви не знайдено</p></div>';
+                return;
+            }
+            grid.innerHTML = visible.map(item => `
+                <article class="menu-item-card">
+                    <div class="menu-item-card-body">
+                        <div class="menu-item-category">${esc(CATEGORY_LABELS[item.category] || item.category)}</div>
+                        <div class="menu-item-name">${esc(item.name)}</div>
+                        ${item.description ? `<div class="menu-item-desc">${esc(item.description)}</div>` : ''}
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">${Number(item.price).toLocaleString('uk-UA')} ₴</span>
+                            ${item.weight ? `<span class="menu-item-weight">${esc(item.weight)}</span>` : ''}
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function applyFilter(category) {
+            activeCategory = category;
+            const filtered = category
+                ? allItems.filter(i => i.category === category)
+                : allItems;
+            renderItems(filtered);
+        }
+
+        async function loadMenu() {
+            try {
+                const resp = await fetch('/api/restaurant/menu');
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                allItems = await resp.json();
+                applyFilter(activeCategory);
+            } catch (err) {
+                grid.innerHTML = `<div class="menu-empty-state"><p>Не вдалося завантажити меню. Спробуйте пізніше.</p></div>`;
+            }
+        }
+
+        filterBar.addEventListener('click', (e) => {
+            const btn = e.target.closest('.menu-filter-btn');
+            if (!btn) return;
+            filterBar.querySelectorAll('.menu-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilter(btn.dataset.category);
+        });
+
+        /* Burger menu */
+        const burger   = document.getElementById('burger');
+        const navLinks = document.getElementById('navLinks');
+        burger.addEventListener('click', () => {
+            const expanded = burger.getAttribute('aria-expanded') === 'true';
+            burger.setAttribute('aria-expanded', String(!expanded));
+            navLinks.classList.toggle('open');
+            document.body.classList.toggle('menu-open');
+        });
+
+        loadMenu();
+    </script>
+</body>
+</html>

@@ -102,11 +102,12 @@
                             <th>Вага</th>
                             <th>Опис</th>
                             <th>Статус</th>
+                            <th>Дії</th>
                         </tr>
                     </thead>
                     <tbody id="menuTbody">
                         <tr class="loading-row">
-                            <td colspan="7"><span class="spinner"></span> Завантаження…</td>
+                            <td colspan="8"><span class="spinner"></span> Завантаження…</td>
                         </tr>
                     </tbody>
                 </table>
@@ -142,6 +143,59 @@
 
         </main>
     </div>
+</div>
+
+<!-- Edit menu item modal -->
+<div id="editMenuModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:2rem;min-width:400px;max-width:600px;width:90%;max-height:90vh;overflow-y:auto;">
+    <h3 style="margin-bottom:1.5rem;">Редагувати страву</h3>
+    <div id="editMenuAlert" class="alert"></div>
+    <input type="hidden" id="editMenuId">
+
+    <div class="form-group">
+        <label for="editMenuName">Назва *</label>
+        <input type="text" id="editMenuName" placeholder="Борщ домашній" required>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="editMenuCategory">Категорія *</label>
+            <select id="editMenuCategory" required>
+                <option value="">— Оберіть —</option>
+                <option value="starters">Закуски</option>
+                <option value="soups">Супи</option>
+                <option value="mains">Основні страви</option>
+                <option value="grill">Гриль</option>
+                <option value="desserts">Десерти</option>
+                <option value="drinks">Напої</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="editMenuPrice">Ціна (₴) *</label>
+            <input type="number" id="editMenuPrice" placeholder="180" min="0.01" step="0.01" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="editMenuWeight">Вага / об'єм</label>
+        <input type="text" id="editMenuWeight" placeholder="350 г">
+    </div>
+
+    <div class="form-group">
+        <label for="editMenuDesc">Опис</label>
+        <textarea id="editMenuDesc" rows="3" placeholder="Традиційний борщ з пампушками…"></textarea>
+    </div>
+
+    <div class="form-group" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="editMenuAvailable" style="width:auto;">
+        <label for="editMenuAvailable" style="margin:0;cursor:pointer;">Активна (відображається в меню)</label>
+    </div>
+
+    <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+        <button id="editMenuSave" class="btn btn-primary">Зберегти</button>
+        <button id="editMenuCancel" class="btn btn-secondary">Скасувати</button>
+    </div>
+  </div>
 </div>
 
 <!-- Add menu item panel -->
@@ -207,7 +261,7 @@
 
 <script type="module">
     import { requireAuth, logout } from './js/auth.js';
-    import { getMenu, addMenuItem, getTableReservations } from './js/api.js';
+    import { getMenu, addMenuItem, updateMenuItem, deleteMenuItem, getTableReservations } from './js/api.js';
 
     if (!requireAuth()) { /* redirected */ }
 
@@ -271,11 +325,11 @@
     /* ── Load menu ─── */
     async function loadMenu() {
         const category = document.getElementById('menuCategoryFilter').value;
-        menuTbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span> Завантаження…</td></tr>';
+        menuTbody.innerHTML = '<tr class="loading-row"><td colspan="8"><span class="spinner"></span> Завантаження…</td></tr>';
         try {
             const items = await getMenu(category);
             if (!items.length) {
-                menuTbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🍽️</div><p>Меню порожнє</p></div></td></tr>';
+                menuTbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🍽️</div><p>Меню порожнє</p></div></td></tr>';
                 return;
             }
             menuTbody.innerHTML = items.map(item => `
@@ -287,10 +341,14 @@
                     <td>${item.weight ? esc(item.weight) : '—'}</td>
                     <td>${item.description ? `<span class="comment-text" title="${esc(item.description)}">${esc(item.description)}</span>` : '—'}</td>
                     <td><span class="badge badge-${item.is_active ? 'active' : 'inactive'}">${item.is_active ? 'Активна' : 'Вимкнена'}</span></td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn btn-secondary btn-sm" data-edit="${item.id}" style="margin-right:4px;">✏️</button>
+                        <button class="btn btn-danger btn-sm" data-delete="${item.id}">🗑️</button>
+                    </td>
                 </tr>
             `).join('');
         } catch (err) {
-            menuTbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><p>Помилка: ${esc(err.message)}</p></div></td></tr>`;
+            menuTbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><p>Помилка: ${esc(err.message)}</p></div></td></tr>`;
             showAlert(err.message);
         }
     }
@@ -359,6 +417,102 @@
             await loadMenu();
         } catch (err) {
             showPanelAlert(err.message);
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Зберегти';
+        }
+    });
+
+    /* ── Edit / Delete via table delegation ─── */
+    menuTbody.addEventListener('click', async (e) => {
+        const editBtn   = e.target.closest('[data-edit]');
+        const deleteBtn = e.target.closest('[data-delete]');
+
+        if (editBtn) {
+            const id = Number(editBtn.dataset.edit);
+            openEditModal(id);
+        }
+
+        if (deleteBtn) {
+            const id = Number(deleteBtn.dataset.delete);
+            if (!confirm('Видалити цю страву?')) return;
+            try {
+                await deleteMenuItem(id);
+                toast('Страву видалено');
+                await loadMenu();
+            } catch (err) {
+                showAlert(err.message);
+            }
+        }
+    });
+
+    /* ── Edit modal ─── */
+    const editModal = document.getElementById('editMenuModal');
+
+    function openEditModal(id) {
+        // Find item data from current table rows
+        const row = menuTbody.querySelector(`[data-edit="${id}"]`)?.closest('tr');
+        if (!row) return;
+        const cells = row.querySelectorAll('td');
+
+        document.getElementById('editMenuId').value       = id;
+        document.getElementById('editMenuName').value     = cells[1]?.querySelector('strong')?.textContent ?? '';
+        document.getElementById('editMenuPrice').value    = parseFloat(cells[3]?.textContent?.replace(/[^\d.]/g, '')) || '';
+        document.getElementById('editMenuWeight').value   = cells[4]?.textContent?.trim() === '—' ? '' : cells[4]?.textContent?.trim() ?? '';
+        document.getElementById('editMenuDesc').value     = cells[5]?.querySelector('.comment-text')?.textContent?.trim() ?? '';
+        const isActive = cells[6]?.querySelector('.badge')?.textContent?.trim() === 'Активна';
+        document.getElementById('editMenuAvailable').checked = isActive;
+
+        // Set category
+        const catCell = cells[2]?.textContent?.trim();
+        const catSelect = document.getElementById('editMenuCategory');
+        for (const opt of catSelect.options) {
+            if (CATEGORY_LABELS[opt.value] === catCell || opt.value === catCell) {
+                catSelect.value = opt.value;
+                break;
+            }
+        }
+
+        document.getElementById('editMenuAlert').className = 'alert';
+        editModal.style.display = 'flex';
+    }
+
+    document.getElementById('editMenuCancel').addEventListener('click', () => {
+        editModal.style.display = 'none';
+    });
+
+    editModal.addEventListener('click', (e) => {
+        if (e.target === editModal) editModal.style.display = 'none';
+    });
+
+    document.getElementById('editMenuSave').addEventListener('click', async () => {
+        const id       = Number(document.getElementById('editMenuId').value);
+        const name     = document.getElementById('editMenuName').value.trim();
+        const category = document.getElementById('editMenuCategory').value;
+        const price    = parseFloat(document.getElementById('editMenuPrice').value);
+        const weight   = document.getElementById('editMenuWeight').value.trim() || null;
+        const desc     = document.getElementById('editMenuDesc').value.trim() || null;
+        const isActive = document.getElementById('editMenuAvailable').checked;
+
+        const alertEl = document.getElementById('editMenuAlert');
+        alertEl.className = 'alert';
+
+        if (!name)     { alertEl.textContent = 'Введіть назву страви'; alertEl.className = 'alert alert-error show'; return; }
+        if (!category) { alertEl.textContent = 'Оберіть категорію';    alertEl.className = 'alert alert-error show'; return; }
+        if (!price || price <= 0) { alertEl.textContent = 'Введіть коректну ціну'; alertEl.className = 'alert alert-error show'; return; }
+
+        const saveBtn = document.getElementById('editMenuSave');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Збереження…';
+
+        try {
+            await updateMenuItem(id, { name, category, price, weight, description: desc, is_active: isActive });
+            toast('Страву оновлено');
+            editModal.style.display = 'none';
+            await loadMenu();
+        } catch (err) {
+            alertEl.textContent = err.message;
+            alertEl.className = 'alert alert-error show';
         } finally {
             saveBtn.disabled = false;
             saveBtn.textContent = 'Зберегти';

@@ -135,6 +135,41 @@ export async function addMenuItem(data) {
 }
 
 /**
+ * Update an existing menu item.
+ * @param {number} id
+ * @param {Object} data
+ * @returns {Promise<Object>}
+ */
+export async function updateMenuItem(id, data) {
+    return apiFetch(`${API_BASE}/restaurant/menu/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+    });
+}
+
+/**
+ * Delete a menu item.
+ * @param {number} id
+ * @returns {Promise<void>}
+ */
+export async function deleteMenuItem(id) {
+    const token = getToken();
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    const resp = await fetch(`${API_BASE}/restaurant/menu/${id}`, { method: 'DELETE', headers });
+    if (resp.status === 401) {
+        logout();
+        throw new Error('Сесія закінчилась, будь ласка увійдіть знову.');
+    }
+    if (!resp.ok) {
+        const json = await resp.json().catch(() => ({}));
+        throw new Error(json?.detail || `HTTP ${resp.status}`);
+    }
+}
+
+/**
  * Fetch all table reservations.
  * @returns {Promise<Array>}
  */

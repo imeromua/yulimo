@@ -8,11 +8,13 @@ from sqlalchemy.orm import Session
 from database import get_db
 from dependencies.auth import require_admin
 from models.user import User
-from schemas.restaurant import MenuItemCreate, MenuItemResponse, TableReservationCreate, TableReservationResponse
+from schemas.restaurant import MenuItemCreate, MenuItemResponse, MenuItemUpdate, TableReservationCreate, TableReservationResponse
 from services.restaurant_service import (
     create_menu_item,
     create_table_reservation,
+    delete_menu_item,
     get_menu,
+    update_menu_item,
 )
 from services import email_service
 
@@ -37,6 +39,37 @@ def add_menu_item_endpoint(
 ):
     """Додати позицію меню (тільки для адміністраторів)."""
     return create_menu_item(data, db)
+
+
+@router.patch(
+    "/menu/{item_id}",
+    response_model=MenuItemResponse,
+)
+def update_menu_item_endpoint(
+    item_id: int,
+    data: MenuItemUpdate,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Оновити позицію меню (тільки для адміністраторів)."""
+    item = update_menu_item(item_id, data, db)
+    if not item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Страву не знайдено")
+    return item
+
+
+@router.delete(
+    "/menu/{item_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_menu_item_endpoint(
+    item_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Видалити позицію меню (тільки для адміністраторів)."""
+    if not delete_menu_item(item_id, db):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Страву не знайдено")
 
 
 @router.post(
