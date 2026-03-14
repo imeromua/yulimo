@@ -733,6 +733,57 @@ table tbody td .comment-text {
 
 .light-form .form-group select option { background: var(--white); color: #1a2a1a; }
 
+/* ── EDIT MENU MODAL (white background) ─────────────── */
+#editMenuModal .form-group label {
+    color: #4a6a4a;
+}
+
+#editMenuModal .form-group input,
+#editMenuModal .form-group select,
+#editMenuModal .form-group textarea {
+    background: #f7f7f7;
+    border: 1px solid rgba(0,0,0,0.15);
+    color: #1a2a1a;
+}
+
+#editMenuModal .form-group input::placeholder,
+#editMenuModal .form-group textarea::placeholder {
+    color: rgba(0,0,0,0.35);
+}
+
+#editMenuModal .form-group input:focus,
+#editMenuModal .form-group select:focus,
+#editMenuModal .form-group textarea:focus {
+    border-color: var(--gold);
+    background: #fff;
+}
+
+#editMenuModal .form-group select option {
+    background: #fff;
+    color: #1a2a1a;
+}
+
+#editMenuModal h3 {
+    color: var(--green-dark);
+}
+
+#editMenuModal label[for="editMenuAvailable"] {
+    color: #2a3a2a;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.9rem;
+}
+
+#editMenuModal .btn-secondary {
+    background: #e8e8e8;
+    color: #2a3a2a;
+    border: 1px solid rgba(0,0,0,0.15);
+}
+
+#editMenuModal .btn-secondary:hover {
+    background: #d8d8d8;
+}
+
 /* ── FORM GRID ──────────────────────────────────────── */
 .form-row {
     display: grid;
