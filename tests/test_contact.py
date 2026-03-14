@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, patch
 def test_contact_success(client):
     """Форма зворотного зв'язку повертає success:true."""
     with patch(
-        "routers.contact.smtp_email_service.send_manual_email",
-        new_callable=AsyncMock,
+        "routers.contact._is_enabled",
+        return_value=False,
     ):
         resp = client.post(
             "/api/contact",

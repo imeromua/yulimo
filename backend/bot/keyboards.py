@@ -22,8 +22,9 @@ def main_menu_keyboard() -> ReplyKeyboardMarkup:
 
 
 def back_to_menu_keyboard() -> InlineKeyboardMarkup:
-    """Порожня клавіатура — статичне меню завжди видно внизу екрану."""
+    """Кнопка повернення до головного меню."""
     builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardButton(text="🏠 На головне меню", callback_data="menu:main"))
     return builder.as_markup()
 
 

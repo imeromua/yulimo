@@ -67,6 +67,7 @@ class TableReservationResponse(BaseModel):
     date: date
     time: time
     guests_count: int
+    comment: Optional[str] = None
     status: str
 
     model_config = {"from_attributes": True}

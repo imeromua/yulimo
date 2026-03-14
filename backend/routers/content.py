@@ -11,7 +11,7 @@ from schemas.content import ContentBlockCreate, ContentBlockRead, ContentBlockUp
 router = APIRouter()
 
 
-@router.get("/api/content", tags=["Контент"])
+@router.get("/content", tags=["Контент"])
 def public_content(db: Session = Depends(get_db)):
     """Публічний ендпойнт — повертає всі блоки як {key: value}."""
     blocks = db.query(ContentBlock).all()
