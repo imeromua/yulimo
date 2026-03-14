@@ -11,7 +11,7 @@ from schemas.settings import SiteSettingBulkUpdate, SiteSettingRead, SiteSetting
 router = APIRouter()
 
 
-@router.get("/api/settings", tags=["Налаштування"])
+@router.get("/settings", tags=["Налаштування"])
 def public_settings(db: Session = Depends(get_db)):
     """Публічний ендпойнт — повертає всі налаштування як {key: value}."""
     settings = db.query(SiteSetting).all()

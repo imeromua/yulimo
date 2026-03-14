@@ -16,6 +16,14 @@ def get_menu(db: Session, category: Optional[str] = None) -> list[MenuItem]:
     return q.all()
 
 
+def get_all_menu_items(db: Session, category: Optional[str] = None) -> list[MenuItem]:
+    """Повертає всі позиції меню (включно з неактивними), для адмін-панелі."""
+    q = db.query(MenuItem)
+    if category:
+        q = q.filter(MenuItem.category == category)
+    return q.order_by(MenuItem.id).all()
+
+
 def create_table_reservation(
     data: TableReservationCreate, db: Session
 ) -> TableReservation:

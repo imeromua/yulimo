@@ -518,27 +518,27 @@ body.menu-open { overflow: hidden; }
 }
 .gallery-card-body p { color: #5c745e; }
 .gallery-forest {
-    background: linear-gradient(180deg, rgba(14,35,24,0.12), rgba(14,35,24,0.02)), url('../images/gallery-forest.jpg');
+    background: linear-gradient(180deg, rgba(14,35,24,0.12), rgba(14,35,24,0.02)), url('../images/lis.jpg');
     background-size: cover;
     background-position: center;
 }
 .gallery-room {
-    background: linear-gradient(135deg, rgba(203,184,161,0.15) 0%, rgba(141,161,124,0.1) 55%, rgba(76,102,70,0.1) 100%), url('../images/gallery-room.jpg');
+    background: linear-gradient(135deg, rgba(203,184,161,0.15) 0%, rgba(141,161,124,0.1) 55%, rgba(76,102,70,0.1) 100%), url('../images/nomer%20lyuks.jpg');
     background-size: cover;
     background-position: center;
 }
 .gallery-food {
-    background: linear-gradient(135deg, rgba(86,53,26,0.15) 0%, rgba(156,109,58,0.1) 48%, rgba(242,208,122,0.1) 100%), url('../images/gallery-food.jpg');
+    background: linear-gradient(135deg, rgba(86,53,26,0.15) 0%, rgba(156,109,58,0.1) 48%, rgba(242,208,122,0.1) 100%), url('../images/restoran.jpg');
     background-size: cover;
     background-position: center;
 }
 .gallery-spa {
-    background: linear-gradient(135deg, rgba(49,75,60,0.15) 0%, rgba(111,138,124,0.1) 42%, rgba(216,199,168,0.1) 100%), url('../images/gallery-spa.jpg');
+    background: linear-gradient(135deg, rgba(49,75,60,0.15) 0%, rgba(111,138,124,0.1) 42%, rgba(216,199,168,0.1) 100%), url('../images/sauna-banya-21.jpg');
     background-size: cover;
     background-position: center;
 }
 .gallery-cottage {
-    background: linear-gradient(135deg, rgba(73,49,29,0.15) 0%, rgba(122,91,63,0.1) 40%, rgba(46,76,54,0.1) 100%), url('../images/gallery-cottage.jpg');
+    background: linear-gradient(135deg, rgba(73,49,29,0.15) 0%, rgba(122,91,63,0.1) 40%, rgba(46,76,54,0.1) 100%), url('../images/kotedzh.jpg');
     background-size: cover;
     background-position: center;
 }

@@ -113,13 +113,13 @@ export async function updateRoom(id, data) {
 /* ── RESTAURANT ────────────────────────────────────── */
 
 /**
- * Fetch menu items.
+ * Fetch menu items (admin view — includes inactive).
  * @param {string} [category]
  * @returns {Promise<Array>}
  */
 export async function getMenu(category = '') {
     const params = category ? `?category=${category}` : '';
-    return apiFetch(`${API_BASE}/restaurant/menu${params}`);
+    return apiFetch(`${API_BASE}/admin/menu${params}`);
 }
 
 /**

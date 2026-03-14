@@ -136,7 +136,7 @@ def reorder_media(
     return {"success": True, "data": None, "message": "Порядок змінено"}
 
 
-@router.get("/api/gallery", tags=["Галерея"])
+@router.get("/gallery", tags=["Галерея"])
 def public_gallery(db: Session = Depends(get_db)):
     items = (
         db.query(Media)
