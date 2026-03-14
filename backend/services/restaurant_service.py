@@ -5,7 +5,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from models.restaurant import MenuItem, TableReservation
-from schemas.restaurant import MenuItemCreate, TableReservationCreate
+from schemas.restaurant import MenuItemCreate, MenuItemUpdate, TableReservationCreate
 
 
 def get_menu(db: Session, category: Optional[str] = None) -> list[MenuItem]:
@@ -43,3 +43,25 @@ def create_menu_item(data: MenuItemCreate, db: Session) -> MenuItem:
     db.commit()
     db.refresh(item)
     return item
+
+
+def update_menu_item(item_id: int, data: MenuItemUpdate, db: Session) -> Optional[MenuItem]:
+    """Оновлює існуючу позицію меню. Повертає None якщо не знайдено."""
+    item = db.query(MenuItem).filter(MenuItem.id == item_id).first()
+    if not item:
+        return None
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(item, field, value)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def delete_menu_item(item_id: int, db: Session) -> bool:
+    """Видаляє позицію меню. Повертає True якщо успішно, False якщо не знайдено."""
+    item = db.query(MenuItem).filter(MenuItem.id == item_id).first()
+    if not item:
+        return False
+    db.delete(item)
+    db.commit()
+    return True

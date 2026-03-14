@@ -26,6 +26,16 @@ class MenuItemCreate(BaseModel):
     is_active: bool = True
 
 
+class MenuItemUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    category: Optional[MenuCategory] = None
+    price: Optional[float] = Field(None, gt=0)
+    description: Optional[str] = None
+    weight: Optional[str] = Field(None, max_length=20)
+    photo: Optional[str] = Field(None, max_length=255)
+    is_active: Optional[bool] = None
+
+
 class MenuItemResponse(BaseModel):
     id: int
     name: str
